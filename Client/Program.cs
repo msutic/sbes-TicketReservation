@@ -17,7 +17,6 @@ namespace Client
             using(WCFClient proxy = new WCFClient(binding, new EndpointAddress(new Uri(address))))
             {
                 Console.WriteLine("Connection established.");
-                proxy.AddPerformance();
             }
 
             Console.ReadKey();

@@ -14,5 +14,18 @@ namespace Contracts
         public int Room { get; set; }
         public double TicketPrice { get; set; }
 
+        public Performance()
+        {
+
+        }
+
+        public Performance(int id, string name, DateTime date, int room, double ticketPrice)
+        {
+            Id = id;
+            Name = name;
+            Date = date;
+            Room = room;
+            TicketPrice = ticketPrice;
+        }
     }
 }

@@ -16,8 +16,9 @@ namespace Client
             factory = this.CreateChannel();
         }
 
-        public void AddPerformance()
+        public void AddPerformance(int key, Performance performance)
         {
+            throw new NotImplementedException();
         }
 
         public void MakeReservation()
@@ -30,12 +31,12 @@ namespace Client
             throw new NotImplementedException();
         }
 
-        public void ModifyPerformance()
+        public void ModifyPerformance(int key, Performance performance)
         {
             throw new NotImplementedException();
         }
 
-        public void PayReservation()
+        public void PayReservation(Reservation reservation)
         {
             throw new NotImplementedException();
         }

@@ -9,14 +9,21 @@ namespace Service
 {
     public class WCFService : IWCFService
     {
-        public void AddPerformance()
+        public void AddPerformance(int key, Performance performance)
         {
-            throw new NotImplementedException();
+            if (!Database.performances.ContainsKey(key))
+            {
+                Database.performances.Add(key, performance);
+            }
+            else
+            {
+                //throw exception
+            }
         }
 
         public void MakeReservation()
         {
-            throw new NotImplementedException();
+            Reservation reservation = new Reservation();
         }
 
         public void ModifyDiscount()
@@ -24,14 +31,24 @@ namespace Service
             throw new NotImplementedException();
         }
 
-        public void ModifyPerformance()
+        public void ModifyPerformance(int key, Performance performance)
         {
-            throw new NotImplementedException();
+            if (Database.performances.ContainsKey(key))
+            {
+                Database.performances[key] = performance;
+            }
+            else
+            {
+                //throw exception
+            }
         }
 
-        public void PayReservation()
+        public void PayReservation(Reservation reservation)
         {
-            throw new NotImplementedException();
+            if (reservation.State.Equals(ReservationState.UNPAID))
+            {
+
+            }
         }
     }
 }

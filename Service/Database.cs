@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Contracts;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +9,7 @@ namespace Service
 {
     public class Database
     {
+        public static Dictionary<int, Performance> performances = new Dictionary<int, Performance>();
+        
     }
 }
