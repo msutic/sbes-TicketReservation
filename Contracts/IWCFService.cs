@@ -11,9 +11,9 @@ namespace Contracts
     public interface IWCFService
     {
         [OperationContract]
-        void AddPerformance(int key, Performance performance);
+        bool AddPerformance(int key, Performance performance);
         [OperationContract]
-        void ModifyPerformance(int key, Performance performance);
+        bool ModifyPerformance(int key, Performance performance);
         [OperationContract]
         void ModifyDiscount();
         [OperationContract]

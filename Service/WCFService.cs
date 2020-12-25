@@ -9,15 +9,17 @@ namespace Service
 {
     public class WCFService : IWCFService
     {
-        public void AddPerformance(int key, Performance performance)
+        public bool AddPerformance(int key, Performance performance)
         {
             if (!Database.performances.ContainsKey(key))
             {
                 Database.performances.Add(key, performance);
+                return true;
             }
             else
             {
                 //throw exception
+                return false;
             }
         }
 
@@ -31,15 +33,17 @@ namespace Service
             throw new NotImplementedException();
         }
 
-        public void ModifyPerformance(int key, Performance performance)
+        public bool ModifyPerformance(int key, Performance performance)
         {
             if (Database.performances.ContainsKey(key))
             {
                 Database.performances[key] = performance;
+                return true;
             }
             else
             {
                 //throw exception
+                return false;
             }
         }
 

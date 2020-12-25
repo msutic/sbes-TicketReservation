@@ -16,9 +16,15 @@ namespace Client
             factory = this.CreateChannel();
         }
 
-        public void AddPerformance(int key, Performance performance)
+        public bool AddPerformance(int key, Performance performance)
         {
-            throw new NotImplementedException();
+            bool retVal = false;
+
+            if(retVal = factory.AddPerformance(0, performance))
+                Console.WriteLine("Performance Added");
+            
+
+            return retVal;
         }
 
         public void MakeReservation()
@@ -31,9 +37,15 @@ namespace Client
             throw new NotImplementedException();
         }
 
-        public void ModifyPerformance(int key, Performance performance)
+        public bool ModifyPerformance(int key, Performance performance)
         {
-            throw new NotImplementedException();
+            bool retVal = false;
+
+            if(retVal = factory.ModifyPerformance(key, performance))
+                Console.WriteLine($"Performance with key {key} modified.");
+
+
+            return retVal;
         }
 
         public void PayReservation(Reservation reservation)

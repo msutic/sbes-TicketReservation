@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.ServiceModel;
+using Contracts;
 
 namespace Client
 {
@@ -17,6 +18,8 @@ namespace Client
             using(WCFClient proxy = new WCFClient(binding, new EndpointAddress(new Uri(address))))
             {
                 Console.WriteLine("Connection established.");
+                Performance p = new Performance(0, "test", DateTime.Now, 4, 450);
+                proxy.AddPerformance(0, p);
             }
 
             Console.ReadKey();
