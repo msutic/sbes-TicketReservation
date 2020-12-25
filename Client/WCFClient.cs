@@ -1,7 +1,10 @@
 ﻿using Contracts;
+using Manager;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using System.Security.Principal;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,11 +16,33 @@ namespace Client
         IWCFService factory;
         public WCFClient(NetTcpBinding binding, EndpointAddress address):base(binding, address)
         {
+            /// cltCertCN.SubjectName should be set to the client's username. .NET WindowsIdentity class provides information about Windows user running the given process
+			string cltCertCN = (Formatter.ParseName(WindowsIdentity.GetCurrent().Name)).ToLower();
+
+            ///Custom validation mode enables creation of a custom validator - CustomCertificateValidator
+            this.Credentials.ServiceCertificate.Authentication.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.Custom;
+            this.Credentials.ServiceCertificate.Authentication.CustomCertificateValidator =  new ClientCertValidator();
+
+            this.Credentials.ServiceCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
+
+            /// Set appropriate client's certificate on the channel. Use CertManager class to obtain the certificate based on the "cltCertCN"
+            this.Credentials.ClientCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, cltCertCN);
+
             factory = this.CreateChannel();
         }
 
-        public void AddPerformance()
-        {
+        public bool AddPerformance(int key, Performance performance)
+        {        
+            try
+            {
+                factory.AddPerformance(0, performance);
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine("client: " + e.Message);
+                Console.ReadLine();
+            }
+            return true;
         }
 
         public void MakeReservation()
@@ -38,6 +63,16 @@ namespace Client
         public void PayReservation()
         {
             throw new NotImplementedException();
+        }
+
+        public void Dispose()
+        {
+            if (factory != null)
+            {
+                factory = null;
+            }
+
+            this.Close();
         }
     }
 }

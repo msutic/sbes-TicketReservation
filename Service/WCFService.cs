@@ -9,9 +9,19 @@ namespace Service
 {
     public class WCFService : IWCFService
     {
-        public void AddPerformance()
+        public bool AddPerformance(int key, Performance performance)
         {
-            throw new NotImplementedException();
+            try
+            {
+                Console.WriteLine("Adding Performance...");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("servis: " + e.Message);
+                Console.ReadLine();
+            }
+            
+            return true;
         }
 
         public void MakeReservation()
