@@ -13,7 +13,7 @@ namespace Service
         public bool AddPerformance(Performance performance)
         {
             Console.WriteLine("Adding performance...");
-            if (CheckIfExists(performance.Id))
+            if (CheckIfPerformanceExists(performance.Id))
             {
                 return false;
             }
@@ -22,7 +22,7 @@ namespace Service
             return true;
         }
 
-        public bool CheckIfExists(int id)
+        public bool CheckIfPerformanceExists(int id)
         {
             foreach(Performance p in Database.performances)
             {
@@ -58,9 +58,24 @@ namespace Service
             }
         }
 
-        public void MakeReservation()
+        public bool MakeReservation(Reservation reservation, string clientUsername)
         {
             Console.WriteLine("Making reservation...");
+            if (!CheckIfPerformanceExists(reservation.PerformanceId)) {
+                Console.WriteLine($"Performance with {reservation.PerformanceId} doesn't exist.");
+                return false;
+            }
+
+            for(int i=0;i <Database.users.Count(); ++i)
+            {
+                if (Database.users[i].Username.Equals(clientUsername))
+                {
+                    Database.users[i].Reservations.Add(reservation);
+                }
+            }
+
+            Database.reservations.Add(reservation);
+            return true;
         }
 
         public void ModifyDiscount(int discount)

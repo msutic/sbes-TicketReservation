@@ -37,12 +37,12 @@ namespace Contracts
 
         public string Write()
         {
-            return $"{Id.ToString()};{PerformanceId.ToString()};{Date.ToString("dd/MM/yyyy")};{TicketQuantity.ToString()};{State.ToString()};{Environment.NewLine}";
+            return $"{Id.ToString()};{PerformanceId.ToString()};{Date.Day.ToString()}/{Date.Month.ToString()}/{Date.Year.ToString()};{TicketQuantity.ToString()};{State.ToString()};{Environment.NewLine}";
         }
 
         public override string ToString()
         {
-                return $"{Id.ToString()};{PerformanceId.ToString()};{Date.ToString("dd/MM/yyyy")};{TicketQuantity.ToString()};{State.ToString()};{Environment.NewLine}";
+                return $"{Id.ToString()};{PerformanceId.ToString()};{Date.Day.ToString()}/{Date.Month.ToString()}/{Date.Year.ToString()};{TicketQuantity.ToString()};{State.ToString()};{Environment.NewLine}";
             
         }
     }

@@ -32,12 +32,12 @@ namespace Contracts
 
         public override string ToString()
         {
-            return $"Performance:\n\tid: {Id}\n\tname: {Name}\n\tdate: {Date.ToString("dd/MM/yyyy")}\n\troom: {Room}\n\tprice: {TicketPrice}\n\n";
+            return $"Performance:\n\tid: {Id}\n\tname: {Name}\n\tdate: {Date.Day.ToString()}/{Date.Month.ToString()}/{Date.Year.ToString()}\n\troom: {Room}\n\tprice: {TicketPrice}\n\n";
         }
 
         public string Write()
         {
-            return $"{Id.ToString()};{Name};{Date.ToString("dd/MM/yyyy")};{Room.ToString()};{TicketPrice.ToString()};{Environment.NewLine}";
+            return $"{Id.ToString()};{Name};{Date.Day.ToString()}/{Date.Month.ToString()}/{Date.Year.ToString()};{Room.ToString()};{TicketPrice.ToString()};{Environment.NewLine}";
         }
     }
 }

@@ -42,12 +42,7 @@ namespace Client
             Console.WriteLine($"Successfully added performance with id {performance.Id}");
             return true;
         }
-
-        public void MakeReservation()
-        {
-            factory.MakeReservation();
-            
-        }
+        
 
         public void ModifyDiscount(int discount)
         {
@@ -80,9 +75,9 @@ namespace Client
             this.Close();
         }
 
-        public bool CheckIfExists(int id)
+        public bool CheckIfPerformanceExists(int id)
         {
-            if (!factory.CheckIfExists(id))
+            if (!factory.CheckIfPerformanceExists(id))
             {
                 Console.WriteLine($"Performance with id = {id} doesn't exist.");
                 return false;
@@ -105,5 +100,14 @@ namespace Client
             factory.ListAllReservations();
         }
 
+        public bool MakeReservation(Reservation reservation, string clientUsername)
+        {
+            if(!factory.MakeReservation(reservation, clientUsername))
+            {
+                Console.WriteLine($"Performance with {reservation.PerformanceId} doesn't exist.");
+                return false;
+            }
+            return true;
+        }
     }
 }

@@ -1,4 +1,4 @@
 sbesserver;sifra1;-1;;
 adminmarko;sifra1;-1;;
-korisnikkristina;sifra1;1200;1,;
+korisnikkristina;sifra1;1200;1,13,;
 superkstefan;sifra1;2000;2,;

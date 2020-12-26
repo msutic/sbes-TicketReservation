@@ -43,9 +43,9 @@ namespace Contracts
                     string s = $"{Username};{Password};{Balance.ToString()};";
                     foreach (Reservation reservation in Reservations)
                     {
-                        s += $"{reservation.Id},;";
+                        s += $"{reservation.Id},";
                     }
-                    s += $"{Environment.NewLine}";
+                    s += $";{Environment.NewLine}";
                     return s;
                 }
                 else

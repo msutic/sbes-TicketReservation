@@ -17,11 +17,11 @@ namespace Contracts
         [OperationContract]
         void ModifyDiscount(int discount);
         [OperationContract]
-        void MakeReservation();
+        bool MakeReservation(Reservation reservation, string clientUsername);
         [OperationContract]
         void PayReservation();
         [OperationContract]
-        bool CheckIfExists(int key);
+        bool CheckIfPerformanceExists(int key);
         [OperationContract]
         void ListAllPerformances();
         [OperationContract]

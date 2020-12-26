@@ -7,6 +7,7 @@ using System.ServiceModel;
 using System.Security.Cryptography.X509Certificates;
 using Manager;
 using Contracts;
+using System.Security.Principal;
 
 namespace Client
 {
@@ -16,6 +17,9 @@ namespace Client
         {
             /// Define the expected service certificate. It is required to establish cmmunication using certificates.
 			string srvCertCN = "sbesserver";
+
+            string cltCertCN = Formatter.ParseName(WindowsIdentity.GetCurrent().Name);
+            Console.WriteLine(cltCertCN);
 
             NetTcpBinding binding = new NetTcpBinding();
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
@@ -33,6 +37,8 @@ namespace Client
             int room;
             double price;
             int discount;
+            int reservationId;
+            int ticketQuantity;
             string[] tokens;
             int input = 0;
 
@@ -68,7 +74,7 @@ namespace Client
                         case 2:
                             Console.WriteLine("\nEnter id of the performance you want to modify: ");
                             id = int.Parse(Console.ReadLine());
-                            if (!proxy.CheckIfExists(id))
+                            if (!proxy.CheckIfPerformanceExists(id))
                                 break;
                             Console.Write("\tname: ");
                             name = Console.ReadLine();
@@ -90,7 +96,15 @@ namespace Client
                             break;
 
                         case 4:
-                            proxy.MakeReservation();
+                            Console.WriteLine("\nEnter id of the performance you want to reserve: ");
+                            id = int.Parse(Console.ReadLine());
+                            if (!proxy.CheckIfPerformanceExists(id))
+                                break;
+                            Console.Write("\n\treservation id: ");
+                            reservationId = int.Parse(Console.ReadLine());
+                            Console.Write("\tticketQuantity: ");
+                            ticketQuantity = int.Parse(Console.ReadLine());
+                            proxy.MakeReservation(new Reservation(reservationId, id, DateTime.Now, ticketQuantity), cltCertCN);
                             break;
                         case 5:
                             proxy.PayReservation();
