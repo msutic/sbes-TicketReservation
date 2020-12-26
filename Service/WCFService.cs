@@ -10,14 +10,20 @@ namespace Service
 {
     public class WCFService : IWCFService
     {
-        public bool AddPerformance(Performance performance)
+        public bool AddPerformance(string name, DateTime date, int room, double price, out int idPerformance)
         {
             Console.WriteLine("Adding performance...");
-            if (CheckIfPerformanceExists(performance.Id))
+            Performance performance = null;
+            if (Database.performances.Count()>0)
             {
-                return false;
+                performance = new Performance(Database.performances.Count(), name, date, room, price);
+                idPerformance = Database.performances.Count();
             }
-
+            else
+            {
+                performance = new Performance(0, name, date, room, price);
+                idPerformance = 0;
+            }
             Database.performances.Add(performance);
             return true;
         }
@@ -58,18 +64,26 @@ namespace Service
             }
         }
 
-        public bool MakeReservation(Reservation reservation, string clientUsername)
+        public bool MakeReservation(int performanceId, DateTime date, int ticketQuantity, string clientUsername, out int reservationId)
         {
             Console.WriteLine("Making reservation...");
-            if (!CheckIfPerformanceExists(reservation.PerformanceId)) {
-                Console.WriteLine($"Performance with {reservation.PerformanceId} doesn't exist.");
-                return false;
-            }
+            Reservation reservation = null;
+            reservationId = -1;
 
-            for(int i=0;i <Database.users.Count(); ++i)
+            for (int i=0;i <Database.users.Count(); ++i)
             {
                 if (Database.users[i].Username.Equals(clientUsername))
                 {
+                    if (Database.reservations.Count()>0)
+                    {
+                        reservation = new Reservation(Database.reservations.Count(), performanceId, date, ticketQuantity);
+                        reservationId = Database.reservations.Count();
+                    }
+                    else
+                    {
+                        reservation = new Reservation(0, performanceId, date, ticketQuantity);
+                        reservationId = 0;
+                    }
                     Database.users[i].Reservations.Add(reservation);
                 }
             }
@@ -102,10 +116,69 @@ namespace Service
             return true;
         }
 
-        public void PayReservation()
+        public bool PayReservationWithoutDiscount(int reservationsId, string clientUsername)
         {
             Console.WriteLine("Paying reservation...");
-            
+            foreach (User u in Database.users)
+            {
+                if (u.Username.Equals(clientUsername))
+                {
+                    foreach (Reservation r in u.Reservations)
+                    {
+                        foreach (Performance p in Database.performances)
+                        {
+                            if (p.Id.Equals(r.PerformanceId))
+                            {
+                                if (r.Id.Equals(reservationsId))
+                                {
+                                    u.Balance -= r.TicketQuantity * p.TicketPrice;
+                                    for (int i = 0; i < u.Reservations.Count(); i++)
+                                    {
+                                        if (u.Reservations[i].Id.Equals(reservationsId))
+                                        {
+                                            u.Reservations[i].State = ReservationState.PAID;
+                                            return true;
+                                        }
+                                    }
+                                }
+                            }
+                                
+                        }
+                    }
+                }
+            }
+            return false;
         }
+
+        public bool CheckIfReservationCanBePaied(int reservationsId, string clientUsername)
+        {
+            foreach (User u in Database.users)
+            {
+                if (u.Username.Equals(clientUsername))
+                {
+                    foreach (Reservation r in u.Reservations)
+                    {
+                        if (r.Id.Equals(reservationsId))
+                        {
+                           foreach (Performance p in Database.performances)
+                           {
+                                if (p.Id.Equals(r.PerformanceId))
+                                {
+                                    if (r.State.Equals(ReservationState.UNPAID))
+                                    {
+                                        if (u.Balance >= r.TicketQuantity * p.TicketPrice)
+                                        {
+                                            return true;
+                                        }
+                                    }
+                                }                                
+                            }                                                   
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
     }
 }

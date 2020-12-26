@@ -17,19 +17,21 @@ namespace Client
         {
             /// Define the expected service certificate. It is required to establish cmmunication using certificates.
 			string srvCertCN = "sbesserver";
-
             string cltCertCN = Formatter.ParseName(WindowsIdentity.GetCurrent().Name);
-            Console.WriteLine(cltCertCN);
 
             NetTcpBinding binding = new NetTcpBinding();
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
             /// Use CertManager class to obtain the certificate based on the "srvCertCN" representing the expected service identity.
 			X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople, StoreLocation.LocalMachine, srvCertCN);
-           
+
+            //X509Certificate2 clientCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, cltCertCN);
+            //string[] parts = clientCert.SubjectName.Name.Split(',');
+            //string clientGroup = parts[1].Split('=')[1];
+            //Console.WriteLine(clientGroup);
+
             EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:9999/Receiver"),
                                       new X509CertificateEndpointIdentity(srvCert));
 
-            Performance p;
             int id;
             string name = "";
             string dateInput = "";
@@ -37,7 +39,6 @@ namespace Client
             int room;
             double price;
             int discount;
-            int reservationId;
             int ticketQuantity;
             string[] tokens;
             int input = 0;
@@ -49,16 +50,15 @@ namespace Client
                 do
                 {
                     Console.WriteLine("\nMenu:\n\t1. Add Performance\n\t2. Modify Performance\n\t3. Modify Discount\n\t" +
-                        "4. Make Reservation\n\t5. Pay Reservation\n\t6. Show all performances\n\t7. Exit\n======================\n");
+                        "4. Make Reservation\n\t5. Pay Reservation\n\t6. Show all performances\n\t" +
+                        "7. Show all users\n\t8. Show all reservations\n\t9. Exit\n======================\n");
 
                     input = int.Parse(Console.ReadLine());
 
                     switch (input)
                     {
                         case 1:
-                            Console.Write("\nNew Performance\n\tid: ");
-                            id = int.Parse(Console.ReadLine());
-                            Console.Write("\tname: ");
+                            Console.Write("\nNew Performance\n\tname: ");
                             name = Console.ReadLine();
                             Console.Write("\tdate (format dd/mm/yyyy): ");
                             dateInput = Console.ReadLine();
@@ -68,7 +68,7 @@ namespace Client
                             room = int.Parse(Console.ReadLine());
                             Console.Write("\tticket price: ");
                             price = double.Parse(Console.ReadLine());
-                            proxy.AddPerformance(new Performance(id, name, date, room, price));
+                            proxy.AddPerformance(name, date, room, price, out id);
                             break;
 
                         case 2:
@@ -100,14 +100,16 @@ namespace Client
                             id = int.Parse(Console.ReadLine());
                             if (!proxy.CheckIfPerformanceExists(id))
                                 break;
-                            Console.Write("\n\treservation id: ");
-                            reservationId = int.Parse(Console.ReadLine());
-                            Console.Write("\tticketQuantity: ");
+                            Console.Write("\n\tticketQuantity: ");
                             ticketQuantity = int.Parse(Console.ReadLine());
-                            proxy.MakeReservation(new Reservation(reservationId, id, DateTime.Now, ticketQuantity), cltCertCN);
+                            proxy.MakeReservation(id, DateTime.Now, ticketQuantity, cltCertCN, out int reservationId);
                             break;
                         case 5:
-                            proxy.PayReservation();
+                            Console.WriteLine("\nEnter id of the reservation you want to pay: ");
+                            id = int.Parse(Console.ReadLine());
+                            if (!proxy.CheckIfReservationCanBePaied(id,cltCertCN))
+                                break;
+                            proxy.PayReservationWithoutDiscount(id,cltCertCN);
                             break;
                         case 6:
                             proxy.ListAllPerformances();
@@ -128,8 +130,6 @@ namespace Client
                 proxy.Close();
 
             }
-
-            Console.ReadKey();
         }
     }
 }

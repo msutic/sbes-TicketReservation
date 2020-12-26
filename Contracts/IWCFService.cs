@@ -11,15 +11,15 @@ namespace Contracts
     public interface IWCFService
     {
         [OperationContract]
-        bool AddPerformance(Performance performance);
+        bool AddPerformance(string name,DateTime date,int room,double price, out int id);
         [OperationContract]
         bool ModifyPerformance(int id, string name, DateTime date, int room, double ticketPrice);
         [OperationContract]
         void ModifyDiscount(int discount);
         [OperationContract]
-        bool MakeReservation(Reservation reservation, string clientUsername);
+        bool MakeReservation(int performanceId, DateTime date, int ticketQuantity, string clientUsername, out int reservationId);
         [OperationContract]
-        void PayReservation();
+        bool PayReservationWithoutDiscount(int reservationsId, string clientUsername);
         [OperationContract]
         bool CheckIfPerformanceExists(int key);
         [OperationContract]
@@ -28,5 +28,7 @@ namespace Contracts
         void ListAllUsers();
         [OperationContract]
         void ListAllReservations();
+        [OperationContract]
+        bool CheckIfReservationCanBePaied(int reservationsId,string clientUsername);
     }
 }

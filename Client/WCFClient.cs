@@ -31,38 +31,44 @@ namespace Client
             factory = this.CreateChannel();
         }
 
-        public bool AddPerformance(Performance performance)
+        public bool AddPerformance(string name, DateTime date, int room, double price, out int idPerformance)
         {
-            if(!factory.AddPerformance(performance))
+            idPerformance = -1;
+            if(factory.AddPerformance(name,date,room,price, out int id))
             {
-                Console.WriteLine("Performance with given id already exists.");
-                return false;
-            }
-            
-            Console.WriteLine($"Successfully added performance with id {performance.Id}");
-            return true;
+                idPerformance = id;
+                Console.WriteLine($"Successfully added new performance with id {id}.");
+                return true;
+            }         
+            return false;
         }
         
 
         public void ModifyDiscount(int discount)
         {
             factory.ModifyDiscount(discount);
+            Console.WriteLine($"Successfully modified discount.");
         }
 
         public bool ModifyPerformance(int id, string name, DateTime date, int room, double ticketPrice)
         {
             if(factory.ModifyPerformance(id,name,date,room,ticketPrice))
             {        
-               Console.WriteLine($"Successfully modified performance with id {id}");
+               Console.WriteLine($"Successfully modified performance with id {id}.");
                return true;
             }
 
             return false;
         }
 
-        public void PayReservation()
+        public bool PayReservationWithoutDiscount(int reservationsId, string clientUsername)
         {
-            factory.PayReservation();
+            if(factory.PayReservationWithoutDiscount(reservationsId,clientUsername))
+            {
+                Console.WriteLine($"Successfully paied reservation with id {reservationsId}.");
+                return true;
+            }
+            return false;
         }
 
         public void Dispose()
@@ -79,7 +85,7 @@ namespace Client
         {
             if (!factory.CheckIfPerformanceExists(id))
             {
-                Console.WriteLine($"Performance with id = {id} doesn't exist.");
+                Console.WriteLine($"Performance with id {id} doesn't exist.");
                 return false;
             }
             return true;
@@ -100,11 +106,23 @@ namespace Client
             factory.ListAllReservations();
         }
 
-        public bool MakeReservation(Reservation reservation, string clientUsername)
+        public bool MakeReservation(int performanceId, DateTime date, int ticketQuantity, string clientUsername, out int reservationId)
         {
-            if(!factory.MakeReservation(reservation, clientUsername))
+            reservationId = -1;
+            if(factory.MakeReservation(performanceId, date, ticketQuantity, clientUsername, out int id))
             {
-                Console.WriteLine($"Performance with {reservation.PerformanceId} doesn't exist.");
+                reservationId = id;
+                Console.WriteLine($"Successfully made new reservation, for performance with id {performanceId}. New reservations id is {reservationId}.");
+                return true;
+            }
+            return false;
+        }
+
+        public bool CheckIfReservationCanBePaied(int reservationsId, string clientUsername)
+        {
+            if(!factory.CheckIfReservationCanBePaied(reservationsId,clientUsername))
+            {
+                Console.WriteLine($"Reservation with id {reservationsId} can't be paied.");
                 return false;
             }
             return true;

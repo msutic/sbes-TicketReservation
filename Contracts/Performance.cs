@@ -21,7 +21,7 @@ namespace Contracts
         [DataMember]
         public double TicketPrice { get; set; }
 
-        public Performance(int id, string name, DateTime date, int room, double ticketPrice)
+        public Performance(int id,string name, DateTime date, int room, double ticketPrice)
         {
             Id = id;
             Name = name;

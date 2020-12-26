@@ -45,36 +45,36 @@ namespace Service
                 {
                     Database.performances = Database.ReadPerformances();
                 }
-                catch (Exception e)
+                catch 
                 {
-                    Console.WriteLine("ERROR - reading performances");
+                    Console.WriteLine("ERROR - reading performances.");
                 }
 
                 try
                 {
                     Database.reservations = Database.ReadReservations();
                 }
-                catch (Exception e)
+                catch 
                 {
-                    Console.WriteLine("ERROR - reading reservations");
+                    Console.WriteLine("ERROR - reading reservations.");
                 }
 
                 try
                 {
                     Database.users = Database.ReadUsers();
                 }
-                catch (Exception e)
+                catch
                 {
-                    Console.WriteLine("ERROR - reading users");
+                    Console.WriteLine("ERROR - reading users.");
                 }      
 
                 try
                 {
                     Database.Discount = Database.ReadDiscount();
                 }
-                catch (Exception e)
+                catch
                 {
-                    Console.WriteLine("ERROR - reading discount");
+                    Console.WriteLine("ERROR - reading discount.");
                 }
                 
                 host.Open();
@@ -94,36 +94,36 @@ namespace Service
                 {
                     Database.WriteAllPerformances();
                 }
-                catch (Exception e)
+                catch 
                 {
-                    Console.WriteLine("ERROR - writing performances: ", e.Message);
+                    Console.WriteLine("ERROR - writing performances.");
                 }
 
                 try
                 {
                     Database.WriteAllUsers();
                 }
-                catch (Exception e)
+                catch 
                 {
-                    Console.WriteLine("ERROR - writing users: ", e.Message);
+                    Console.WriteLine("ERROR - writing users.");
                 }
 
                 try
                 {
                     Database.WriteAllReservations();
                 }
-                catch (Exception e)
+                catch 
                 {
-                    Console.WriteLine("ERROR - writing reservations: ", e.Message);
+                    Console.WriteLine("ERROR - writing reservations.");
                 }
 
                 try
                 {
                     Database.WriteDiscount();
                 }
-                catch (Exception e)
+                catch
                 {
-                    Console.WriteLine("ERROR - writing discount: ", e.Message);
+                    Console.WriteLine("ERROR - writing discount.");
                 }
             }
 

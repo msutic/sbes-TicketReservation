@@ -15,7 +15,7 @@ namespace Contracts
         [DataMember]
         public string Password { get; set; }
         [DataMember]
-        public int Balance { get; set; }
+        public double Balance { get; set; }
         [DataMember]
         public List<Reservation> Reservations { get; set; }
 
@@ -26,7 +26,7 @@ namespace Contracts
             Balance = -1;
         }
 
-        public User(string username, string password, int balance, List<Reservation> reservations)
+        public User(string username, string password, double balance, List<Reservation> reservations)
         {
             Username = username;
             Password = password;

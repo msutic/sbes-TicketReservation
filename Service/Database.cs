@@ -91,7 +91,7 @@ namespace Service
                             }
                         }
                     }
-                    user = new User(tokens[0], tokens[1], int.Parse(tokens[2]), userReservations);
+                    user = new User(tokens[0], tokens[1], double.Parse(tokens[2]), userReservations);
                 }
                 else
                 {
