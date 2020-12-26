@@ -14,5 +14,19 @@ namespace Contracts
         public int TicketQuantity { get; set; }
         public ReservationState State { get; set; }
 
+        public Reservation()
+        {
+            State = ReservationState.UNPAID;
+        }
+
+        public Reservation(int id, int perfId, DateTime date, int ticketQuantity)
+        {
+            Id = id;
+            PerformanceId = perfId;
+            Date = date;
+            TicketQuantity = ticketQuantity;
+            State = ReservationState.UNPAID;
+        }
+
     }
 }

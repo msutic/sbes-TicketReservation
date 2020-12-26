@@ -31,38 +31,44 @@ namespace Client
             factory = this.CreateChannel();
         }
 
-        public bool AddPerformance(int key, Performance performance)
-        {        
-            try
+        public bool AddPerformance(Performance performance)
+        {
+            if(!factory.AddPerformance(performance))
             {
-                factory.AddPerformance(0, performance);
+                Console.WriteLine("Performance with given key already exists.");
+                return false;
             }
-            catch(Exception e)
-            {
-                Console.WriteLine("client: " + e.Message);
-                Console.ReadLine();
-            }
+            
+            Console.WriteLine($"Successfully added performance with id {performance.Id}");
             return true;
         }
 
         public void MakeReservation()
         {
-            throw new NotImplementedException();
+            factory.MakeReservation();
+            
         }
 
-        public void ModifyDiscount()
+        public void ModifyDiscount(int discount)
         {
-            throw new NotImplementedException();
+            factory.ModifyDiscount(discount);
         }
 
-        public void ModifyPerformance()
+        public bool ModifyPerformance(Performance performance)
         {
-            throw new NotImplementedException();
+            if(!factory.ModifyPerformance(performance))
+            {
+                Console.WriteLine($"Performance with id {performance.Id} doesn't exist.");
+                return false;
+            }
+            
+            Console.WriteLine($"Successfully modified performance with id {performance.Id}");
+            return true;
         }
 
         public void PayReservation()
         {
-            throw new NotImplementedException();
+            factory.PayReservation();
         }
 
         public void Dispose()
@@ -74,5 +80,25 @@ namespace Client
 
             this.Close();
         }
+
+        public bool CheckIfExists(int key)
+        {
+            if (!factory.CheckIfExists(key))
+            {
+                Console.WriteLine($"Performance with id = {key} doesn't exist.");
+                return false;
+            }
+            return true;
+        }
+
+        public void ListAllPerformances()
+        {
+            factory.ListAllPerformances();
+        }
+
+        //public List<Performance> ReadPerformances()
+        //{
+        //    return factory.ReadPerformances();
+        //}
     }
 }

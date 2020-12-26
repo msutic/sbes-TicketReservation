@@ -63,5 +63,10 @@
       <Name>Manager</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="items\performances.txt" />
+    <Content Include="items\reservations.txt" />
+    <Content Include="items\UserBase.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

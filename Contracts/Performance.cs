@@ -29,5 +29,10 @@ namespace Contracts
             Room = room;
             TicketPrice = ticketPrice;
         }
+
+        public override string ToString()
+        {
+            return $"Performance:\n\tid: {Id},\n\tname: {Name},\n\tdate: {Date.ToString("dd/MM/yyyy")},\n\troom: {Room},\n\tprice: {TicketPrice}\n\n";
+        }
     }
 }

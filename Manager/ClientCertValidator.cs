@@ -17,12 +17,15 @@ namespace Manager
         /// If validation fails, throw an exception with an adequate message.
         /// </summary>
         /// <param name="certificate"> certificate to be validate </param>
+        public string Group { get; set; }
         public override void Validate(X509Certificate2 certificate)
         {          
             if (!certificate.Issuer.Equals(certificate.Subject))
             {
                 throw new Exception("Certificate is not self-signed.");
             }
+
+            
                 
         }
     }
