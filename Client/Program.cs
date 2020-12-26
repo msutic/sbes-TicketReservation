@@ -24,25 +24,26 @@ namespace Client
            
             EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:9999/Receiver"),
                                       new X509CertificateEndpointIdentity(srvCert));
-            
+
+            Performance p;
+            int id;
+            string name = "";
+            string dateInput = "";
+            DateTime date;
+            int room;
+            double price;
+            int discount;
+            string[] tokens;
+            int input = 0;
+
             using (WCFClient proxy = new WCFClient(binding, address))
             {
                 Console.WriteLine("Connection established.");
-                Performance p;
-                int id;
-                string name = "";
-                string dateInput = "";
-                DateTime date;
-                int room;
-                double price;
-                int discount;
-                string[] tokens;
-                int input = 0;
-
+                
                 do
                 {
                     Console.WriteLine("\nMenu:\n\t1. Add Performance\n\t2. Modify Performance\n\t3. Modify Discount\n\t" +
-                        "4. Make Reservation\n\t5. Pay Reservation\n\t6. Show all performances\n======================\n");
+                        "4. Make Reservation\n\t5. Pay Reservation\n\t6. Show all performances\n\t7. Exit\n======================\n");
 
                     input = int.Parse(Console.ReadLine());
 
@@ -79,7 +80,7 @@ namespace Client
                             room = int.Parse(Console.ReadLine());
                             Console.Write("\tticket price: ");
                             price = double.Parse(Console.ReadLine());
-                            proxy.ModifyPerformance(new Performance(id, name, date, room, price));
+                            proxy.ModifyPerformance(id, name, date, room, price);
                             break;
 
                         case 3:
@@ -98,10 +99,16 @@ namespace Client
                             proxy.ListAllPerformances();
                             break;
                         case 7:
+                            proxy.ListAllUsers();
+                            break;
+                        case 8:
+                            proxy.ListAllReservations();
+                            break;
+                        case 9:
                             break;
                     }
                 }
-                while (input != 7);
+                while (input != 9);
 
                 proxy.Dispose();
                 proxy.Close();

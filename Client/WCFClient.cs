@@ -35,7 +35,7 @@ namespace Client
         {
             if(!factory.AddPerformance(performance))
             {
-                Console.WriteLine("Performance with given key already exists.");
+                Console.WriteLine("Performance with given id already exists.");
                 return false;
             }
             
@@ -54,16 +54,15 @@ namespace Client
             factory.ModifyDiscount(discount);
         }
 
-        public bool ModifyPerformance(Performance performance)
+        public bool ModifyPerformance(int id, string name, DateTime date, int room, double ticketPrice)
         {
-            if(!factory.ModifyPerformance(performance))
-            {
-                Console.WriteLine($"Performance with id {performance.Id} doesn't exist.");
-                return false;
+            if(factory.ModifyPerformance(id,name,date,room,ticketPrice))
+            {        
+               Console.WriteLine($"Successfully modified performance with id {id}");
+               return true;
             }
-            
-            Console.WriteLine($"Successfully modified performance with id {performance.Id}");
-            return true;
+
+            return false;
         }
 
         public void PayReservation()
@@ -81,11 +80,11 @@ namespace Client
             this.Close();
         }
 
-        public bool CheckIfExists(int key)
+        public bool CheckIfExists(int id)
         {
-            if (!factory.CheckIfExists(key))
+            if (!factory.CheckIfExists(id))
             {
-                Console.WriteLine($"Performance with id = {key} doesn't exist.");
+                Console.WriteLine($"Performance with id = {id} doesn't exist.");
                 return false;
             }
             return true;
@@ -96,9 +95,15 @@ namespace Client
             factory.ListAllPerformances();
         }
 
-        //public List<Performance> ReadPerformances()
-        //{
-        //    return factory.ReadPerformances();
-        //}
+        public void ListAllUsers()
+        {
+            factory.ListAllUsers();
+        }
+
+        public void ListAllReservations()
+        {
+            factory.ListAllReservations();
+        }
+
     }
 }

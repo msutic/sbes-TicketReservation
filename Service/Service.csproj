@@ -64,9 +64,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="items\discount.txt" />
     <Content Include="items\performances.txt" />
     <Content Include="items\reservations.txt" />
-    <Content Include="items\UserBase.txt" />
+    <Content Include="items\users.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

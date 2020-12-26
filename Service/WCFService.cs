@@ -36,10 +36,25 @@ namespace Service
 
         public void ListAllPerformances()
         {
-            Console.WriteLine("ulazim");
             foreach(Performance p in Database.performances)
             {
                 Console.WriteLine(p.ToString());
+            }
+        }
+
+        public void ListAllUsers()
+        {
+            foreach (User u in Database.users)
+            {
+                Console.WriteLine(u.ToString());
+            }
+        }
+
+        public void ListAllReservations()
+        {
+            foreach (Reservation r in Database.reservations)
+            {
+                Console.WriteLine(r.ToString());
             }
         }
 
@@ -54,18 +69,19 @@ namespace Service
             Database.Discount = discount;
         }
 
-        public bool ModifyPerformance(Performance performance)
+        public bool ModifyPerformance(int id, string name, DateTime date, int room, double ticketPrice)
         {
             Console.WriteLine("Modifying performance...");
-            if (CheckIfExists(performance.Id))
-            {
-                return false;
-            } 
 
-            for(int i =0;i<Database.performances.Count(); ++i)
+            for(int i=0; i<Database.performances.Count(); ++i)
             {
-                if (performance.Id == Database.performances[i].Id)
-                    Database.performances[i] = performance;
+                if (id == Database.performances[i].Id)
+                {
+                    Database.performances[i].Name = name;
+                    Database.performances[i].Date = date;
+                    Database.performances[i].Room = room;
+                    Database.performances[i].TicketPrice = ticketPrice;
+                }
             }
             
             return true;
@@ -76,32 +92,5 @@ namespace Service
             Console.WriteLine("Paying reservation...");
             
         }
-
-        //public List<Performance> ReadPerformances()
-        //{
-        //    string path = @"D:\novo_git\sbes-TicketReservation\performances.txt";
-
-        //    List<Performance> performances = new List<Performance>();
-        //    FileStream stream = new FileStream(path, FileMode.Open);
-        //    StreamReader reader = new StreamReader(stream);
-
-        //    string line = "";
-        //    while ((line = reader.ReadLine()) != null)
-        //    {
-        //        string[] tokens = line.Split(';');
-        //        Console.WriteLine("evo usao u while");
-        //        string[] dateTokens = tokens[2].Split('/');
-        //        DateTime date = new DateTime(int.Parse(dateTokens[2]), int.Parse(dateTokens[1]), int.Parse(dateTokens[0]));
-
-        //        Performance p = new Performance(int.Parse(tokens[0]), tokens[1], date, int.Parse(tokens[3]), double.Parse(tokens[4]));
-
-        //        performances.Add(p);
-        //    }
-
-        //    reader.Close();
-        //    stream.Close();
-
-        //    return performances;
-        //}
     }
 }

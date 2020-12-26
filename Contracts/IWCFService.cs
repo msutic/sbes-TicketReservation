@@ -13,7 +13,7 @@ namespace Contracts
         [OperationContract]
         bool AddPerformance(Performance performance);
         [OperationContract]
-        bool ModifyPerformance(Performance performance);
+        bool ModifyPerformance(int id, string name, DateTime date, int room, double ticketPrice);
         [OperationContract]
         void ModifyDiscount(int discount);
         [OperationContract]
@@ -24,7 +24,9 @@ namespace Contracts
         bool CheckIfExists(int key);
         [OperationContract]
         void ListAllPerformances();
-        //[OperationContract]
-        //List<Performance> ReadPerformances();
+        [OperationContract]
+        void ListAllUsers();
+        [OperationContract]
+        void ListAllReservations();
     }
 }

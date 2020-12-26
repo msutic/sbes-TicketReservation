@@ -51,10 +51,5 @@
     <Compile Include="ReservationState.cs" />
     <Compile Include="User.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="performances.txt" />
-    <Content Include="items\reservations.txt" />
-    <Content Include="items\UserBase.txt" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

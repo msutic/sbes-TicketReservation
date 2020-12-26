@@ -1,4 +1,0 @@
-sbesserver;sifra1;0;;
-adminmarko;sifra1;0;;
-korisnikkristina;sifra1;2000;1;
-superkstefan;sifra1;2200;2;

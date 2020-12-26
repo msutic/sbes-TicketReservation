@@ -1,17 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Contracts
 {
+    [DataContract]
     public class Reservation
     {
+        [DataMember]
         public int Id { get; set; }
+        [DataMember]
         public int PerformanceId { get; set; }
+        [DataMember]
         public DateTime Date { get; set; }
+        [DataMember]
         public int TicketQuantity { get; set; }
+        [DataMember]
         public ReservationState State { get; set; }
 
         public Reservation()
@@ -28,5 +35,15 @@ namespace Contracts
             State = ReservationState.UNPAID;
         }
 
+        public string Write()
+        {
+            return $"{Id.ToString()};{PerformanceId.ToString()};{Date.ToString("dd/MM/yyyy")};{TicketQuantity.ToString()};{State.ToString()};{Environment.NewLine}";
+        }
+
+        public override string ToString()
+        {
+                return $"{Id.ToString()};{PerformanceId.ToString()};{Date.ToString("dd/MM/yyyy")};{TicketQuantity.ToString()};{State.ToString()};{Environment.NewLine}";
+            
+        }
     }
 }

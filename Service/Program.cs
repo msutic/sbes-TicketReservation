@@ -38,6 +38,42 @@ namespace Service
 
             try
             {
+                try
+                {
+                    Database.performances = Database.ReadPerformances();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("ERROR - reading performances");
+                }
+
+                try
+                {
+                    Database.reservations = Database.ReadReservations();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("ERROR - reading reservations");
+                }
+
+                try
+                {
+                    Database.users = Database.ReadUsers();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("ERROR - reading users");
+                }      
+
+                try
+                {
+                    Database.Discount = Database.ReadDiscount();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("ERROR - reading discount");
+                }
+                
                 host.Open();
                 Console.WriteLine("WCFService is started.\nPress <enter> to stop ...");
                 Console.ReadLine();
@@ -51,6 +87,41 @@ namespace Service
             finally
             {
                 host.Close();
+                try
+                {
+                    Database.WriteAllPerformances();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("ERROR - writing performances: ", e.Message);
+                }
+
+                try
+                {
+                    Database.WriteAllUsers();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("ERROR - writing users: ", e.Message);
+                }
+
+                try
+                {
+                    Database.WriteAllReservations();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("ERROR - writing reservations: ", e.Message);
+                }
+
+                try
+                {
+                    Database.WriteDiscount();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("ERROR - writing discount: ", e.Message);
+                }
             }
 
         }

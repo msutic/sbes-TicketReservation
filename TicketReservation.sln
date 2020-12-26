@@ -9,13 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contracts", "Contracts\Contracts.csproj", "{FC9E7E65-7812-45A3-997A-9467D34D855A}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{597FCF61-23F3-47A8-878E-202F78615E41}"
-	ProjectSection(SolutionItems) = preProject
-		performances.txt = performances.txt
-		reservations.txt = reservations.txt
-		UserBase.txt = UserBase.txt
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Manager", "Manager\Manager.csproj", "{21349608-0498-45FC-B828-C9E89F9ECA4E}"
 EndProject
 Global
