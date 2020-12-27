@@ -45,10 +45,8 @@ namespace Client
                 {
                     Console.WriteLine("\nMenu:\n\t1. Add Performance\n\t2. Modify Performance\n\t3. Modify Discount\n\t" +
                         "4. Make Reservation\n\t5. Pay Reservation\n\t6. Show all performances\n\t" +
-                        "7. Show all users\n\t8. Show all reservations\n\t9. Exit\n======================\n");
-                    //dodati da pokazuje korisnika sa njegovim trenutnim stanjem na racunu
-                    //dodati da pokazuje sve korisnike i njihova stanja na racunu
-                    //dodati da pokazuje popust
+                        "7. Show all users\n\t8. Show all reservations\n\t9. Show discount\n\t10. Show my informations\n\t" +
+                        "11. Exit\n\t\n======================\n");
 
                     input = int.Parse(Console.ReadLine());
 
@@ -116,7 +114,7 @@ namespace Client
                             id = int.Parse(Console.ReadLine());
                             if (!proxy.CheckIfReservationCanBePaied(id))
                                 break;
-                            proxy.PayReservationWithoutDiscount(id);
+                            proxy.PayReservation(id);
                             break;
                         case 6:
                             proxy.ListAllPerformances();
@@ -128,10 +126,16 @@ namespace Client
                             proxy.ListAllReservations();
                             break;
                         case 9:
+                            proxy.ListDiscount();
+                            break;
+                        case 10:
+                            proxy.ListUser();
+                            break;
+                        case 11:
                             break;
                     }
                 }
-                while (input != 9);
+                while (input != 11);
 
                 proxy.Dispose();
                 proxy.Close();

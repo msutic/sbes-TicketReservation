@@ -102,6 +102,8 @@ namespace Service
 
         public void ListAllUsers()
         {
+            Console.WriteLine();
+            Console.WriteLine("List of users in the system:");
             foreach (User u in Database.users)
             {
                 Console.WriteLine(u.ToString());
@@ -170,10 +172,11 @@ namespace Service
             return true;
         }
 
-        public bool PayReservationWithoutDiscount(int reservationsId)
+        public bool PayReservation(int reservationsId)
         {
             string[] tokens = clientCertSubjectName.Split(',');
             string clientUsername = tokens[0].Split('=')[1];
+            string clientRole = tokens[1].Split('=')[1];
             Console.WriteLine("Paying reservation...");
             foreach (User u in Database.users)
             {
@@ -187,7 +190,15 @@ namespace Service
                             {
                                 if (r.Id.Equals(reservationsId))
                                 {
-                                    u.Balance -= r.TicketQuantity * p.TicketPrice;
+                                    if (clientRole == "Korisnik")
+                                    { 
+                                       u.Balance -= r.TicketQuantity * p.TicketPrice;
+                                    }
+                                    else
+                                    {
+                                        u.Balance -= r.TicketQuantity * p.TicketPrice - (r.TicketQuantity * p.TicketPrice) * (Database.Discount / 100);
+                                    }
+
                                     for (int i = 0; i < u.Reservations.Count(); i++)
                                     {
                                         if (u.Reservations[i].Id.Equals(reservationsId))
@@ -210,6 +221,7 @@ namespace Service
         {
             string[] tokens = clientCertSubjectName.Split(',');
             string clientUsername = tokens[0].Split('=')[1];
+            string clientRole = tokens[1].Split('=')[1];
             foreach (User u in Database.users)
             {
                 if (u.Username.Equals(clientUsername))
@@ -224,9 +236,19 @@ namespace Service
                                 {
                                     if (r.State.Equals(ReservationState.UNPAID))
                                     {
-                                        if (u.Balance >= r.TicketQuantity * p.TicketPrice)
+                                        if (clientRole == "Korisnik")
                                         {
-                                            return true;
+                                            if (u.Balance >= r.TicketQuantity * p.TicketPrice)
+                                            {
+                                                return true;
+                                            }
+                                        }    
+                                        else
+                                        {                    
+                                            if (u.Balance >= r.TicketQuantity * p.TicketPrice - (r.TicketQuantity * p.TicketPrice) * (Database.Discount / 100))
+                                            {
+                                                return true;
+                                            }
                                         }
                                     }
                                 }                                
@@ -241,6 +263,18 @@ namespace Service
         public void SendMySubjectName(string subjectName)
         {
             clientCertSubjectName = subjectName;
+        }
+
+        public void ListDiscount()
+        {
+            Console.WriteLine($"Current discount is {Database.Discount}");
+        }
+
+        public void ListUser()
+        {
+            string[] tokens = clientCertSubjectName.Split(',');
+            string clientUsername = tokens[0].Split('=')[1];
+            Console.WriteLine($"My informations: {Database.users.First(item => item.Username == clientUsername).ToString()}");
         }
     }
 }

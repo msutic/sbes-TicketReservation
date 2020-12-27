@@ -20,7 +20,7 @@ namespace Contracts
         [OperationContract]
         bool MakeReservation(int performanceId, DateTime date, int ticketQuantity, out int reservationId);
         [OperationContract]
-        bool PayReservationWithoutDiscount(int reservationsId);
+        bool PayReservation(int reservationsId);
         [OperationContract]
         bool CheckIfPerformanceExists(int key);
         [OperationContract]
@@ -29,6 +29,10 @@ namespace Contracts
         void ListAllUsers();
         [OperationContract]
         void ListAllReservations();
+        [OperationContract]
+        void ListDiscount();
+        [OperationContract]
+        void ListUser();
         [OperationContract]
         bool CheckIfReservationCanBePaied(int reservationsId);
         [FaultContract(typeof(SecurityException))]

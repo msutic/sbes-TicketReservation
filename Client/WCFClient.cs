@@ -60,9 +60,9 @@ namespace Client
             return false;
         }
 
-        public bool PayReservationWithoutDiscount(int reservationsId)
+        public bool PayReservation(int reservationsId)
         {
-            if(factory.PayReservationWithoutDiscount(reservationsId))
+            if(factory.PayReservation(reservationsId))
             {
                 Console.WriteLine($"Successfully paied reservation with id {reservationsId}.");
                 return true;
@@ -147,5 +147,14 @@ namespace Client
             factory.SendMySubjectName(this.Credentials.ClientCertificate.Certificate.SubjectName.Name);
         }
 
+        public void ListDiscount()
+        {
+            factory.ListDiscount();
+        }
+
+        public void ListUser()
+        {
+            factory.ListUser();
+        }
     }
 }

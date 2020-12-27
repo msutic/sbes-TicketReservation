@@ -15,7 +15,7 @@ namespace Service
         public static List<Performance> performances;
         public static List<User> users;
         public static List<Reservation> reservations;
-        public static int Discount { get; set; }
+        public static double Discount { get; set; }
 
         public static List<Performance> ReadPerformances()
         {

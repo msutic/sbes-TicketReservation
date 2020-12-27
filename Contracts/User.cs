@@ -62,27 +62,19 @@ namespace Contracts
 
         public override string ToString()
         {
+            string s = $"\nuser: {Username}\nbalance: {Balance}";
             if (Balance != -1)
             {
                 if (Reservations.Count() > 0)
                 {
-                    string s = $"{Username};{Password};{Balance};";
+                    s += $"\nid of reservations: ";
                     foreach (Reservation reservation in Reservations)
                     {
-                        s += $"{reservation.Id},;";
+                        s += $"{reservation.Id} ";
                     }
-                    s += $"{Environment.NewLine}";
-                    return s;
-                }
-                else
-                {
-                    return $"{Username};{Password};{Balance};;{Environment.NewLine}";
                 }
             }
-            else
-            {
-                return $"{Username};{Password};{Balance};;{Environment.NewLine}";
-            }
+            return s;
         }
     }
 }

@@ -19,7 +19,7 @@ namespace Manager
         /// <param name="certificate"> certificate to be validate </param>
         public override void Validate(X509Certificate2 certificate)
         {
-            string service = (Formatter.ParseName(WindowsIdentity.GetCurrent().Name)).ToLower(); //servis
+            string service = Formatter.ParseName(WindowsIdentity.GetCurrent().Name); //servis
 
             X509Certificate2 certificateOfService = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, service);
 
