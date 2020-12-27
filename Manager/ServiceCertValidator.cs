@@ -11,7 +11,6 @@ namespace Manager
 {
     public class ServiceCertValidator : X509CertificateValidator
     {
-        public string usernameClient { get; set; }
         /// <summary>
         /// Implementation of a custom certificate validation on the service side.
         /// Service should consider certificate valid if its issuer is the same as the issuer of the service.
@@ -27,9 +26,7 @@ namespace Manager
             if (!certificate.Issuer.Equals(certificateOfService.Subject))
             {
                 throw new Exception("Cert is not from the valid issuer");
-            }
-            string[] token = certificate.SubjectName.Name.Split(',');
-            usernameClient = token[0].Split('=')[1];
+            }           
         }
     }
 }

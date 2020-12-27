@@ -1,8 +1,12 @@
 ﻿using Contracts;
+using Manager;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using System.Security.Principal;
+using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,8 +14,56 @@ namespace Service
 {
     public class WCFService : IWCFService
     {
+        public static string clientCertSubjectName { get; set; }
+
+        public string GetClientRole()
+        {            
+            string[] parts = clientCertSubjectName.Split(',');
+            return parts[1].Split('=')[1];
+        }
+
+        public void ErrorMessage(string group, string method)
+        {
+            string[] tokens = clientCertSubjectName.Split(',');
+            string name = tokens[0].Split('=')[1];
+            DateTime time = DateTime.Now;
+            string message = String.Format($"Access is denied. User {name} try to call {method} method (time : {time}). " +
+                $"For this method user needs to be member of group {group}.");
+            throw new FaultException<SecurityException>(new SecurityException(message));
+        }
+
+        public bool Validation(string methodName)
+        {          
+            if (GetClientRole().Equals("Admin"))
+            {
+                if (methodName.Equals("Add Performance") || methodName.Equals("Modify Performance") || methodName.Equals("Modify Discount"))
+                { 
+                   return true;
+                }
+                else
+                {
+                   ErrorMessage("SuperKorisnik/Korisnik", methodName);
+                   return false;
+                }
+            }
+           else
+           {
+                if (methodName.Equals("Make Reservation") || methodName.Equals("Pay Reservation"))
+                {
+                    return true;
+                }
+                else
+                {
+                    ErrorMessage("Admin", methodName);
+                    return false;
+                }
+           }
+        }
+
         public bool AddPerformance(string name, DateTime date, int room, double price, out int idPerformance)
         {
+            idPerformance = -1;
+            
             Console.WriteLine("Adding performance...");
             Performance performance = null;
             if (Database.performances.Count()>0)
@@ -64,11 +116,13 @@ namespace Service
             }
         }
 
-        public bool MakeReservation(int performanceId, DateTime date, int ticketQuantity, string clientUsername, out int reservationId)
+        public bool MakeReservation(int performanceId, DateTime date, int ticketQuantity, out int reservationId)
         {
+            reservationId = -1;
             Console.WriteLine("Making reservation...");
             Reservation reservation = null;
-            reservationId = -1;
+            string[] tokens = clientCertSubjectName.Split(',');
+            string clientUsername = tokens[0].Split('=')[1];
 
             for (int i=0;i <Database.users.Count(); ++i)
             {
@@ -116,8 +170,10 @@ namespace Service
             return true;
         }
 
-        public bool PayReservationWithoutDiscount(int reservationsId, string clientUsername)
+        public bool PayReservationWithoutDiscount(int reservationsId)
         {
+            string[] tokens = clientCertSubjectName.Split(',');
+            string clientUsername = tokens[0].Split('=')[1];
             Console.WriteLine("Paying reservation...");
             foreach (User u in Database.users)
             {
@@ -150,8 +206,10 @@ namespace Service
             return false;
         }
 
-        public bool CheckIfReservationCanBePaied(int reservationsId, string clientUsername)
+        public bool CheckIfReservationCanBePaied(int reservationsId)
         {
+            string[] tokens = clientCertSubjectName.Split(',');
+            string clientUsername = tokens[0].Split('=')[1];
             foreach (User u in Database.users)
             {
                 if (u.Username.Equals(clientUsername))
@@ -180,5 +238,9 @@ namespace Service
             return false;
         }
 
+        public void SendMySubjectName(string subjectName)
+        {
+            clientCertSubjectName = subjectName;
+        }
     }
 }

@@ -17,7 +17,7 @@ namespace Client
         public WCFClient(NetTcpBinding binding, EndpointAddress address):base(binding, address)
         {
             /// cltCertCN.SubjectName should be set to the client's username. .NET WindowsIdentity class provides information about Windows user running the given process
-			string cltCertCN = (Formatter.ParseName(WindowsIdentity.GetCurrent().Name)).ToLower();
+			string cltCertCN = Formatter.ParseName(WindowsIdentity.GetCurrent().Name);
 
             ///Custom validation mode enables creation of a custom validator - CustomCertificateValidator
             this.Credentials.ServiceCertificate.Authentication.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.Custom;
@@ -43,7 +43,6 @@ namespace Client
             return false;
         }
         
-
         public void ModifyDiscount(int discount)
         {
             factory.ModifyDiscount(discount);
@@ -61,9 +60,9 @@ namespace Client
             return false;
         }
 
-        public bool PayReservationWithoutDiscount(int reservationsId, string clientUsername)
+        public bool PayReservationWithoutDiscount(int reservationsId)
         {
-            if(factory.PayReservationWithoutDiscount(reservationsId,clientUsername))
+            if(factory.PayReservationWithoutDiscount(reservationsId))
             {
                 Console.WriteLine($"Successfully paied reservation with id {reservationsId}.");
                 return true;
@@ -106,10 +105,10 @@ namespace Client
             factory.ListAllReservations();
         }
 
-        public bool MakeReservation(int performanceId, DateTime date, int ticketQuantity, string clientUsername, out int reservationId)
+        public bool MakeReservation(int performanceId, DateTime date, int ticketQuantity, out int reservationId)
         {
             reservationId = -1;
-            if(factory.MakeReservation(performanceId, date, ticketQuantity, clientUsername, out int id))
+            if(factory.MakeReservation(performanceId, date, ticketQuantity, out int id))
             {
                 reservationId = id;
                 Console.WriteLine($"Successfully made new reservation, for performance with id {performanceId}. New reservations id is {reservationId}.");
@@ -118,14 +117,35 @@ namespace Client
             return false;
         }
 
-        public bool CheckIfReservationCanBePaied(int reservationsId, string clientUsername)
+        public bool CheckIfReservationCanBePaied(int reservationsId)
         {
-            if(!factory.CheckIfReservationCanBePaied(reservationsId,clientUsername))
+            if(!factory.CheckIfReservationCanBePaied(reservationsId))
             {
                 Console.WriteLine($"Reservation with id {reservationsId} can't be paied.");
                 return false;
             }
             return true;
         }
+
+        public bool Validation(string methodName)
+        {
+            bool retValue = false;
+            try 
+            {
+                factory.Validation(methodName);
+                retValue = true;
+            }
+            catch (FaultException<SecurityException> e)
+            {
+                Console.WriteLine(e.Detail.Message);
+            }
+            return retValue;
+        }
+
+        public void SendMySubjectName(string subjectName)
+        {
+            factory.SendMySubjectName(this.Credentials.ClientCertificate.Certificate.SubjectName.Name);
+        }
+
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,9 +18,9 @@ namespace Contracts
         [OperationContract]
         void ModifyDiscount(int discount);
         [OperationContract]
-        bool MakeReservation(int performanceId, DateTime date, int ticketQuantity, string clientUsername, out int reservationId);
+        bool MakeReservation(int performanceId, DateTime date, int ticketQuantity, out int reservationId);
         [OperationContract]
-        bool PayReservationWithoutDiscount(int reservationsId, string clientUsername);
+        bool PayReservationWithoutDiscount(int reservationsId);
         [OperationContract]
         bool CheckIfPerformanceExists(int key);
         [OperationContract]
@@ -29,6 +30,11 @@ namespace Contracts
         [OperationContract]
         void ListAllReservations();
         [OperationContract]
-        bool CheckIfReservationCanBePaied(int reservationsId,string clientUsername);
+        bool CheckIfReservationCanBePaied(int reservationsId);
+        [FaultContract(typeof(SecurityException))]
+        [OperationContract]
+        bool Validation(string methodName);
+        [OperationContract]
+        void SendMySubjectName(string subjectName);
     }
 }
