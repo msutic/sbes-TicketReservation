@@ -42,8 +42,8 @@ namespace Contracts
 
         public override string ToString()
         {
-                return $"{Id.ToString()};{PerformanceId.ToString()};{Date.Day.ToString()}/{Date.Month.ToString()}/{Date.Year.ToString()};{TicketQuantity.ToString()};{State.ToString()};{Environment.NewLine}";
-            
+            return $"Reservation:\n\tid: {Id.ToString()}\n\tperformance id: {PerformanceId.ToString()}\n\tdate of reservation: {Date.Day.ToString()}/{Date.Month.ToString()}/{Date.Year.ToString()}" +
+                $"\n\tnumber of tickets:{TicketQuantity.ToString()}\n\tstate of reservation: {State.ToString()}\n\n";            
         }
     }
 }

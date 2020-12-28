@@ -14,17 +14,26 @@ namespace Service
 {
     public class WCFService : IWCFService
     {
-        public static string clientCertSubjectName { get; set; }
+        public static string ClientCertSubjectName { get; set; }
 
         public string GetClientRole()
-        {            
-            string[] parts = clientCertSubjectName.Split(',');
-            return parts[1].Split('=')[1];
+        {
+            string retValue = "";
+            try
+            {
+                string[] parts = ClientCertSubjectName.Split(',');
+                retValue = parts[1].Split('=')[1];
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error while trying to get the client role: {e.Message}.");
+            }
+            return retValue;
         }
 
         public void ErrorMessage(string group, string method)
         {
-            string[] tokens = clientCertSubjectName.Split(',');
+            string[] tokens = ClientCertSubjectName.Split(',');
             string name = tokens[0].Split('=')[1];
             DateTime time = DateTime.Now;
             string message = String.Format($"Access is denied. User {name} try to call {method} method (time : {time}). " +
@@ -62,8 +71,7 @@ namespace Service
 
         public bool AddPerformance(string name, DateTime date, int room, double price, out int idPerformance)
         {
-            idPerformance = -1;
-            
+            idPerformance = -1;           
             Console.WriteLine("Adding performance...");
             Performance performance = null;
             if (Database.performances.Count()>0)
@@ -84,7 +92,7 @@ namespace Service
         {
             foreach(Performance p in Database.performances)
             {
-                if(p.Id == id)
+                if(p.Id.Equals(id))
                 {
                     return true;
                 }
@@ -94,7 +102,9 @@ namespace Service
 
         public void ListAllPerformances()
         {
-            foreach(Performance p in Database.performances)
+            Console.WriteLine();
+            Console.WriteLine("List of performances in the system:");
+            foreach (Performance p in Database.performances)
             {
                 Console.WriteLine(p.ToString());
             }
@@ -112,6 +122,8 @@ namespace Service
 
         public void ListAllReservations()
         {
+            Console.WriteLine();
+            Console.WriteLine("List of reservations in the system:");
             foreach (Reservation r in Database.reservations)
             {
                 Console.WriteLine(r.ToString());
@@ -123,7 +135,7 @@ namespace Service
             reservationId = -1;
             Console.WriteLine("Making reservation...");
             Reservation reservation = null;
-            string[] tokens = clientCertSubjectName.Split(',');
+            string[] tokens = ClientCertSubjectName.Split(',');
             string clientUsername = tokens[0].Split('=')[1];
 
             for (int i=0;i <Database.users.Count(); ++i)
@@ -160,7 +172,7 @@ namespace Service
 
             for(int i=0; i<Database.performances.Count(); ++i)
             {
-                if (id == Database.performances[i].Id)
+                if (id.Equals(Database.performances[i].Id))
                 {
                     Database.performances[i].Name = name;
                     Database.performances[i].Date = date;
@@ -174,7 +186,7 @@ namespace Service
 
         public bool PayReservation(int reservationsId)
         {
-            string[] tokens = clientCertSubjectName.Split(',');
+            string[] tokens = ClientCertSubjectName.Split(',');
             string clientUsername = tokens[0].Split('=')[1];
             string clientRole = tokens[1].Split('=')[1];
             Console.WriteLine("Paying reservation...");
@@ -190,7 +202,7 @@ namespace Service
                             {
                                 if (r.Id.Equals(reservationsId))
                                 {
-                                    if (clientRole == "Korisnik")
+                                    if (clientRole.Equals("Korisnik"))
                                     { 
                                        u.Balance -= r.TicketQuantity * p.TicketPrice;
                                     }
@@ -219,7 +231,7 @@ namespace Service
 
         public bool CheckIfReservationCanBePaied(int reservationsId)
         {
-            string[] tokens = clientCertSubjectName.Split(',');
+            string[] tokens = ClientCertSubjectName.Split(',');
             string clientUsername = tokens[0].Split('=')[1];
             string clientRole = tokens[1].Split('=')[1];
             foreach (User u in Database.users)
@@ -236,7 +248,7 @@ namespace Service
                                 {
                                     if (r.State.Equals(ReservationState.UNPAID))
                                     {
-                                        if (clientRole == "Korisnik")
+                                        if (clientRole.Equals("Korisnik"))
                                         {
                                             if (u.Balance >= r.TicketQuantity * p.TicketPrice)
                                             {
@@ -258,23 +270,36 @@ namespace Service
                 }
             }
             return false;
-        }
-
-        public void SendMySubjectName(string subjectName)
-        {
-            clientCertSubjectName = subjectName;
-        }
+        }       
 
         public void ListDiscount()
         {
+            //audit ne radi
+            //gde ide audit dispose
             Console.WriteLine($"Current discount is {Database.Discount}");
+            //string[] tokens = ClientCertSubjectName.Split(',');
+            //string clientUsername = tokens[0].Split('=')[1];
+            //try
+            //{
+            //    Audit.AuthorizationSuccess(Formatter.ParseName(WindowsIdentity.GetCurrent().Name),
+            //        OperationContext.Current.IncomingMessageHeaders.Action);
+            //}
+            //catch (Exception e)
+            //{
+            //    Console.WriteLine(e.Message);
+            //}
         }
 
         public void ListUser()
         {
-            string[] tokens = clientCertSubjectName.Split(',');
+            string[] tokens = ClientCertSubjectName.Split(',');
             string clientUsername = tokens[0].Split('=')[1];
             Console.WriteLine($"My informations: {Database.users.First(item => item.Username == clientUsername).ToString()}");
+        }
+
+        public void SendMySubjectName(string subjectName)
+        {
+            ClientCertSubjectName = subjectName;
         }
     }
 }

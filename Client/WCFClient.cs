@@ -31,106 +31,183 @@ namespace Client
             factory = this.CreateChannel();
         }
 
-        public bool AddPerformance(string name, DateTime date, int room, double price, out int idPerformance)
-        {
-            idPerformance = -1;
-            if(factory.AddPerformance(name,date,room,price, out int id))
-            {
-                idPerformance = id;
-                Console.WriteLine($"Successfully added new performance with id {id}.");
-                return true;
-            }         
-            return false;
-        }
-        
-        public void ModifyDiscount(int discount)
-        {
-            factory.ModifyDiscount(discount);
-            Console.WriteLine($"Successfully modified discount.");
-        }
-
         public bool ModifyPerformance(int id, string name, DateTime date, int room, double ticketPrice)
         {
-            if(factory.ModifyPerformance(id,name,date,room,ticketPrice))
-            {        
-               Console.WriteLine($"Successfully modified performance with id {id}.");
-               return true;
-            }
-
-            return false;
-        }
-
-        public bool PayReservation(int reservationsId)
-        {
-            if(factory.PayReservation(reservationsId))
+            try
             {
-                Console.WriteLine($"Successfully paied reservation with id {reservationsId}.");
-                return true;
+                if (factory.ModifyPerformance(id, name, date, room, ticketPrice))
+                {
+                    Console.WriteLine($"Successfully modified performance with id {id}.");
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error while trying to modify performance: {e.Message}.");
             }
             return false;
-        }
-
-        public void Dispose()
-        {
-            if (factory != null)
-            {
-                factory = null;
-            }
-
-            this.Close();
         }
 
         public bool CheckIfPerformanceExists(int id)
         {
-            if (!factory.CheckIfPerformanceExists(id))
+            try
             {
-                Console.WriteLine($"Performance with id {id} doesn't exist.");
-                return false;
+                if (!factory.CheckIfPerformanceExists(id))
+                {
+                    Console.WriteLine($"Performance with id {id} doesn't exist.");
+                    return false;
+                }
             }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error while trying to check if performance exists {e.Message}.");
+            }
+
             return true;
         }
 
+        public bool AddPerformance(string name, DateTime date, int room, double price, out int idPerformance)
+        {
+            idPerformance = -1;
+            try
+            {
+                if (factory.AddPerformance(name, date, room, price, out int id))
+                {
+                    idPerformance = id;
+                    Console.WriteLine($"Successfully added new performance with id {id}.");
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error while trying to add performance: {e.Message}.");
+            }
+            return false;
+        }
+
+        public void ModifyDiscount(int discount)
+        {
+            try
+            {
+                factory.ModifyDiscount(discount);
+                Console.WriteLine($"Successfully modified discount.");
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine($"Error while trying to modify discount {e.Message}.");
+            }
+        }
+
+        public bool PayReservation(int reservationsId)
+        {
+            try
+            {
+                if (factory.PayReservation(reservationsId))
+                {
+                    Console.WriteLine($"Successfully paied reservation with id {reservationsId}.");
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error while trying to pay reservation: {e.Message}.");
+            }
+            return false;
+        }       
+
         public void ListAllPerformances()
         {
-            factory.ListAllPerformances();
+            try
+            {
+                factory.ListAllPerformances();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error while trying to list all performances: {e.Message}.");
+            }
         }
 
         public void ListAllUsers()
         {
-            factory.ListAllUsers();
+            try
+            { 
+                factory.ListAllUsers();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error while trying to list all users: {e.Message}.");
+            }
         }
 
         public void ListAllReservations()
         {
-            factory.ListAllReservations();
+            try
+            { 
+                factory.ListAllReservations();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error while trying to list all reservations: {e.Message}.");
+            }
         }
 
         public bool MakeReservation(int performanceId, DateTime date, int ticketQuantity, out int reservationId)
         {
             reservationId = -1;
-            if(factory.MakeReservation(performanceId, date, ticketQuantity, out int id))
+            try
             {
-                reservationId = id;
-                Console.WriteLine($"Successfully made new reservation, for performance with id {performanceId}. New reservations id is {reservationId}.");
-                return true;
+                if (factory.MakeReservation(performanceId, date, ticketQuantity, out int id))
+                {
+                    reservationId = id;
+                    Console.WriteLine($"Successfully made new reservation, for performance with id {performanceId}. New reservations id is {reservationId}.");
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error while trying to make reservation: ${e.Message}.");
             }
             return false;
         }
 
         public bool CheckIfReservationCanBePaied(int reservationsId)
         {
-            if(!factory.CheckIfReservationCanBePaied(reservationsId))
+            try
             {
-                Console.WriteLine($"Reservation with id {reservationsId} can't be paied.");
-                return false;
+                if (!factory.CheckIfReservationCanBePaied(reservationsId))
+                {
+                    Console.WriteLine($"Reservation with id {reservationsId} can't be paied.");
+                    return false;
+                }
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine($"Error while trying to check if reservation can be paied: {e.Message}.");
             }
             return true;
         }
 
+        public void ListDiscount()
+        {
+            try
+            { 
+                factory.ListDiscount();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error while trying to list the discount: {e.Message}.");
+            }
+        }
+
+        public void ListUser()
+        {
+            factory.ListUser();
+        }
+        
         public bool Validation(string methodName)
         {
             bool retValue = false;
-            try 
+            try
             {
                 factory.Validation(methodName);
                 retValue = true;
@@ -144,17 +221,24 @@ namespace Client
 
         public void SendMySubjectName(string subjectName)
         {
-            factory.SendMySubjectName(this.Credentials.ClientCertificate.Certificate.SubjectName.Name);
+            try
+            {
+                factory.SendMySubjectName(this.Credentials.ClientCertificate.Certificate.SubjectName.Name);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error while trying to send username of the client: {e.Message}.");
+            }
         }
 
-        public void ListDiscount()
+        public void Dispose()
         {
-            factory.ListDiscount();
-        }
+            if (factory != null)
+            {
+                factory = null;
+            }
 
-        public void ListUser()
-        {
-            factory.ListUser();
+            this.Close();
         }
     }
 }

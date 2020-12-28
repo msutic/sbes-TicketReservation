@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,179 +18,245 @@ namespace Service
         public static List<Reservation> reservations;
         public static double Discount { get; set; }
 
-        public static List<Performance> ReadPerformances()
+        public static void ReadPerformances()
         {
-            List<Performance> performances = new List<Performance>();
-            string fullPath = Path.GetFullPath(path + "performances.txt");
-
-            FileStream stream = new FileStream(fullPath, FileMode.Open);
-            StreamReader reader = new StreamReader(stream);
-            string line = "";
-            while ((line = reader.ReadLine()) != null)
+            try
             {
-                string[] tokens = line.Split(';');
-                string[] dateTokens = tokens[2].Split('/');
-                DateTime date = new DateTime(int.Parse(dateTokens[2]), int.Parse(dateTokens[1]), int.Parse(dateTokens[0]));
+                string fullPath = Path.GetFullPath(path + "performances.txt");
 
-                Performance p = new Performance(int.Parse(tokens[0]), tokens[1], date, int.Parse(tokens[3]), double.Parse(tokens[4]));
-                performances.Add(p);
-            }
-
-            reader.Close();
-            stream.Close();
-
-            return performances;
-        }
-
-        public static int ReadDiscount()
-        {
-            int discount = -1;
-            string fullPath = Path.GetFullPath(path + "discount.txt");
-
-            FileStream stream = new FileStream(fullPath, FileMode.Open);
-            StreamReader reader = new StreamReader(stream);
-
-            string line = "";
-            while ((line = reader.ReadLine()) != null)
-            {
-                discount = int.Parse(line);
-            }
-
-            reader.Close();
-            stream.Close();
-
-            return discount;
-        }
-
-        public static List<User> ReadUsers()
-        {
-            List<User> users = new List<User>();
-            string fullPath = Path.GetFullPath(path + "users.txt");
-
-            FileStream stream = new FileStream(fullPath, FileMode.Open);
-            StreamReader reader = new StreamReader(stream);
-
-            string line = "";
-
-            while ((line = reader.ReadLine()) != null)
-            {
-                string[] tokens = line.Split(';');
-
-                List<Reservation> userReservations = new List<Reservation>();
-                User user = null;
-                int count = tokens[3].Count(x => x == ',');
-                if (count != 0)
+                FileStream stream = new FileStream(fullPath, FileMode.Open);
+                StreamReader reader = new StreamReader(stream);
+                string line = "";
+                while ((line = reader.ReadLine()) != null)
                 {
-                    string[] idRes = tokens[3].Split(',');
-                    for (int i = 0; i < count; i++)
+                    string[] tokens = line.Split(';');
+                    string[] dateTokens = tokens[2].Split('/');
+                    DateTime date = new DateTime(int.Parse(dateTokens[2]), int.Parse(dateTokens[1]), int.Parse(dateTokens[0]));
+
+                    Performance p = new Performance(int.Parse(tokens[0]), tokens[1], date, int.Parse(tokens[3]), double.Parse(tokens[4]));
+                    performances.Add(p);
+                }
+
+                reader.Close();
+                stream.Close();
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine($"Error while trying to read performances : {e.Message}");
+            }
+        }
+
+        public static void ReadDiscount()
+        {
+            try
+            {
+                string fullPath = Path.GetFullPath(path + "discount.txt");
+
+                FileStream stream = new FileStream(fullPath, FileMode.Open);
+                StreamReader reader = new StreamReader(stream);
+
+                string line = "";
+                while ((line = reader.ReadLine()) != null)
+                {
+                    Discount = int.Parse(line);
+                }
+
+                reader.Close();
+                stream.Close();
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error while trying to read discount : {e.Message}");
+            }
+        }
+
+        public static void ReadUsers()
+        {
+            try
+            {
+                string fullPath = Path.GetFullPath(path + "users.txt");
+
+                FileStream stream = new FileStream(fullPath, FileMode.Open);
+                StreamReader reader = new StreamReader(stream);
+
+                string line = "";
+
+                while ((line = reader.ReadLine()) != null)
+                {
+                    string[] tokens = line.Split(';');
+
+                    List<Reservation> userReservations = new List<Reservation>();
+                    User user = null;
+                    int count = tokens[3].Count(x => x == ',');
+                    if (count != 0)
                     {
-                        foreach (Reservation res in reservations)
+                        string[] idRes = tokens[3].Split(',');
+                        for (int i = 0; i < count; i++)
                         {
-                            if (int.Parse(idRes[i]) == res.Id)
+                            foreach (Reservation res in reservations)
                             {
-                                userReservations.Add(res);
+                                if (int.Parse(idRes[i]) == res.Id)
+                                {
+                                    userReservations.Add(res);
+                                }
                             }
                         }
+                        user = new User(tokens[0], tokens[1], double.Parse(tokens[2]), userReservations);
                     }
-                    user = new User(tokens[0], tokens[1], double.Parse(tokens[2]), userReservations);
+                    else
+                    {
+                        user = new User(tokens[0], tokens[1]);
+                    }
+                    users.Add(user);
                 }
-                else
-                {
-                    user = new User(tokens[0], tokens[1]);
-                }
-                users.Add(user);
+
+                reader.Close();
+                stream.Close();
             }
-
-            reader.Close();
-            stream.Close();
-
-            return users;
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error while trying to read users : {e.Message}");
+            }
         }
 
-        public static List<Reservation> ReadReservations()
+        public static void ReadReservations()
         {
-            List<Reservation> reservations = new List<Reservation>();
-            string fullPath = Path.GetFullPath(path + "reservations.txt");
-
-            FileStream stream = new FileStream(fullPath, FileMode.Open);
-            StreamReader reader = new StreamReader(stream);
-
-            string line = "";
-            while ((line = reader.ReadLine()) != null)
+            try
             {
-                string[] tokens = line.Split(';');
+                string fullPath = Path.GetFullPath(path + "reservations.txt");
 
-                string[] dateTokens = tokens[2].Split('/');
-                DateTime date = new DateTime(int.Parse(dateTokens[2]), int.Parse(dateTokens[1]), int.Parse(dateTokens[0]));
+                FileStream stream = new FileStream(fullPath, FileMode.Open);
+                StreamReader reader = new StreamReader(stream);
 
-                Reservation r = new Reservation(int.Parse(tokens[0]), int.Parse(tokens[1]), date, int.Parse(tokens[3]));
-                r.State = (ReservationState)Enum.Parse(typeof(ReservationState), tokens[4]);
-                reservations.Add(r);
+                string line = "";
+                while ((line = reader.ReadLine()) != null)
+                {
+                    string[] tokens = line.Split(';');
+
+                    string[] dateTokens = tokens[2].Split('/');
+                    DateTime date = new DateTime(int.Parse(dateTokens[2]), int.Parse(dateTokens[1]), int.Parse(dateTokens[0]));
+
+                    Reservation r = new Reservation(int.Parse(tokens[0]), int.Parse(tokens[1]), date, int.Parse(tokens[3]));
+                    r.State = (ReservationState)Enum.Parse(typeof(ReservationState), tokens[4]);
+                    reservations.Add(r);
+                }
+
+                reader.Close();
+                stream.Close();
             }
-
-            reader.Close();
-            stream.Close();
-            return reservations;
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error while trying to read performances : {e.Message}");
+            }
         }
 
         public static void WritePerformance(Performance p)
         {
-            string fullPath = Path.GetFullPath(path + "performances.txt");
-            File.AppendAllText(fullPath, p.Write());
+            try
+            {
+                string fullPath = Path.GetFullPath(path + "performances.txt");
+                File.AppendAllText(fullPath, p.Write());
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error while trying to write performance with id {p.Id}, error: : {e.Message}");
+            }
         }
 
         public static void WriteAllPerformances()
         {
-            string fullPath = Path.GetFullPath(path + "performances.txt");
-            File.WriteAllText(fullPath, String.Empty);
-
-            foreach (Performance p in performances)
+            try
             {
-                WritePerformance(p);
+                string fullPath = Path.GetFullPath(path + "performances.txt");
+                File.WriteAllText(fullPath, String.Empty);
+
+                foreach (Performance p in performances)
+                {
+                    WritePerformance(p);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error while trying to write all performances : {e.Message}");
             }
         }
 
         public static void WriteUser(User u)
         {
-            string fullPath = Path.GetFullPath(path + "users.txt");
-            File.AppendAllText(fullPath, u.Write());
+            try
+            {
+                string fullPath = Path.GetFullPath(path + "users.txt");
+                File.AppendAllText(fullPath, u.Write());
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error while trying to write user with username {u.Username}, error: : {e.Message}");
+            }
         }
 
         public static void WriteAllUsers()
         {
-            string fullPath = Path.GetFullPath(path + "users.txt");
-            File.WriteAllText(fullPath, String.Empty);
-
-            foreach (User u in users)
+            try
             {
-                WriteUser(u);
+                string fullPath = Path.GetFullPath(path + "users.txt");
+                File.WriteAllText(fullPath, String.Empty);
+
+                foreach (User u in users)
+                {
+                    WriteUser(u);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error while trying to write all users : {e.Message}");
             }
         }
 
         public static void WriteDiscount()
         {
-            string fullPath = Path.GetFullPath(path + "discount.txt");
-            File.WriteAllText(fullPath, String.Empty);
-            File.AppendAllText(fullPath, Discount.ToString());
+            try
+            {
+                string fullPath = Path.GetFullPath(path + "discount.txt");
+                File.WriteAllText(fullPath, String.Empty);
+                File.AppendAllText(fullPath, Discount.ToString());
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error while trying to write discount : {e.Message}");
+            }
         }
 
         public static void WriteReservation(Reservation r)
         {
-            string fullPath = Path.GetFullPath(path + "reservations.txt");
-            File.AppendAllText(fullPath, r.Write());
+            try
+            {
+                string fullPath = Path.GetFullPath(path + "reservations.txt");
+                File.AppendAllText(fullPath, r.Write());
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error while trying to write reservation with id {r.Id}, error: : {e.Message}");
+            }
         }
 
         public static void WriteAllReservations()
         {
-            string fullPath = Path.GetFullPath(path + "reservations.txt");
-            File.WriteAllText(fullPath, String.Empty);
-
-            foreach (Reservation r in reservations)
+            try
             {
-                WriteReservation(r);
+                string fullPath = Path.GetFullPath(path + "reservations.txt");
+                File.WriteAllText(fullPath, String.Empty);
+
+                foreach (Reservation r in reservations)
+                {
+                    WriteReservation(r);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error while trying to write all performances : {e.Message}");
             }
         }
-
        
     }
 }

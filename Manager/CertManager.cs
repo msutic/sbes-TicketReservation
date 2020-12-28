@@ -22,23 +22,32 @@ namespace Manager
             X509Store store = new X509Store(storeName, storeLocation);
             store.Open(OpenFlags.ReadOnly);
 
-            X509Certificate2Collection collection = store.Certificates.Find(X509FindType.FindBySubjectName, subjectName, true);
-            foreach(X509Certificate2 item in collection)
+            try
             {
-                if (item.SubjectName.Name.Contains(','))
+                X509Certificate2Collection collection = store.Certificates.Find(X509FindType.FindBySubjectName, subjectName, true);
+                foreach (X509Certificate2 item in collection)
                 {
-                    string[] parts = item.SubjectName.Name.Split(',');
-                    if (parts[0].Equals(string.Format("CN={0}", subjectName)))
+                    if (item.SubjectName.Name.Contains(','))
+                    {
+                        string[] parts = item.SubjectName.Name.Split(',');
+                        if (parts[0].Equals(string.Format("CN={0}", subjectName)))
+                        {
+                            return item;
+                        }
+                    }
+
+                    if (item.SubjectName.Name.Equals(string.Format("CN={0}", subjectName)))
                     {
                         return item;
                     }
                 }
-
-                if(item.SubjectName.Name.Equals(string.Format("CN={0}",subjectName)))
-                {
-                    return item;
-                }
             }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error while trying to get certificate from storage: {e.Message}");
+            }
+
+            //LOGIKA ZA AUTENTIFIKACIJU
 
             return null;
         }

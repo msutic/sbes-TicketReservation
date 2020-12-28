@@ -7,6 +7,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.ServiceModel;
+using System.ServiceModel.Description;
 using System.ServiceModel.Security;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,45 +38,22 @@ namespace Service
             ///Set appropriate service's certificate on the host. Use CertManager class to obtain the certificate based on the "srvCertCN"
             host.Credentials.ServiceCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
 
+            //AuditBehaviour
+            ServiceSecurityAuditBehavior newAudit = new ServiceSecurityAuditBehavior();
+            newAudit.AuditLogLocation = AuditLogLocation.Application;
+            newAudit.ServiceAuthorizationAuditLevel = AuditLevel.SuccessOrFailure;
+
+            host.Description.Behaviors.Remove<ServiceSecurityAuditBehavior>();
+            host.Description.Behaviors.Add(newAudit);
+
+
+            Database.ReadPerformances();
+            Database.ReadReservations();
+            Database.ReadUsers();
+            Database.ReadDiscount();           
+
             try
-            {
-                
-                try
-                {
-                    Database.performances = Database.ReadPerformances();
-                }
-                catch 
-                {
-                    Console.WriteLine("ERROR - reading performances.");
-                }
-
-                try
-                {
-                    Database.reservations = Database.ReadReservations();
-                }
-                catch 
-                {
-                    Console.WriteLine("ERROR - reading reservations.");
-                }
-
-                try
-                {
-                    Database.users = Database.ReadUsers();
-                }
-                catch
-                {
-                    Console.WriteLine("ERROR - reading users.");
-                }      
-
-                try
-                {
-                    Database.Discount = Database.ReadDiscount();
-                }
-                catch
-                {
-                    Console.WriteLine("ERROR - reading discount.");
-                }
-                
+            {                 
                 host.Open();
                 Console.WriteLine("WCFService is started.\nPress <enter> to stop ...");
                 Console.ReadLine();
@@ -89,41 +67,10 @@ namespace Service
             finally
             {
                 host.Close();
-                try
-                {
-                    Database.WriteAllPerformances();
-                }
-                catch 
-                {
-                    Console.WriteLine("ERROR - writing performances.");
-                }
-
-                try
-                {
-                    Database.WriteAllUsers();
-                }
-                catch 
-                {
-                    Console.WriteLine("ERROR - writing users.");
-                }
-
-                try
-                {
-                    Database.WriteAllReservations();
-                }
-                catch 
-                {
-                    Console.WriteLine("ERROR - writing reservations.");
-                }
-
-                try
-                {
-                    Database.WriteDiscount();
-                }
-                catch
-                {
-                    Console.WriteLine("ERROR - writing discount.");
-                }
+                Database.WriteAllPerformances();
+                Database.WriteAllUsers();
+                Database.WriteAllReservations();
+                Database.WriteDiscount();
             }
 
         }

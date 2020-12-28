@@ -43,7 +43,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FileOperations.cs" />
     <Compile Include="IWCFService.cs" />
     <Compile Include="Performance.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

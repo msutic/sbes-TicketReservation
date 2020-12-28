@@ -47,10 +47,16 @@ namespace Client
                         "4. Make Reservation\n\t5. Pay Reservation\n\t6. Show all performances\n\t" +
                         "7. Show all users\n\t8. Show all reservations\n\t9. Show discount\n\t10. Show my informations\n\t" +
                         "11. Exit\n\t\n======================\n");
+                    try
+                    {
+                        input = int.Parse(Console.ReadLine());
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine($"Invalid input: {e.Message}.");
+                    }
 
-                    input = int.Parse(Console.ReadLine());
-
-                    switch (input)
+                    switch (input) //da li treba validirati da su dobri unosi
                     {
                         case 1:
                             if (!proxy.Validation("Add Performance"))
@@ -133,13 +139,15 @@ namespace Client
                             break;
                         case 11:
                             break;
+                        default:
+                            Console.WriteLine("Entered invalid number. Valid 1-11. Please try again.");
+                            break;
                     }
                 }
                 while (input != 11);
 
                 proxy.Dispose();
                 proxy.Close();
-
             }
         }
     }
