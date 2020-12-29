@@ -219,18 +219,6 @@ namespace Client
             return retValue;
         }
 
-        public void SendMySubjectName(string subjectName)
-        {
-            try
-            {
-                factory.SendMySubjectName(this.Credentials.ClientCertificate.Certificate.SubjectName.Name);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"Error while trying to send username of the client: {e.Message}.");
-            }
-        }
-
         public void Dispose()
         {
             if (factory != null)

@@ -27,7 +27,7 @@ namespace Service
             string address = "net.tcp://localhost:9999/Receiver";
             ServiceHost host = new ServiceHost(typeof(WCFService));
             host.AddServiceEndpoint(typeof(IWCFService), binding, address);
-
+            
             ///Custom validation mode enables creation of a custom validator - CustomCertificateValidator
             host.Credentials.ClientCertificate.Authentication.CertificateValidationMode = X509CertificateValidationMode.Custom;
             host.Credentials.ClientCertificate.Authentication.CustomCertificateValidator = new ServiceCertValidator();
@@ -37,7 +37,7 @@ namespace Service
 
             ///Set appropriate service's certificate on the host. Use CertManager class to obtain the certificate based on the "srvCertCN"
             host.Credentials.ServiceCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
-
+            
             //AuditBehaviour
             ServiceSecurityAuditBehavior newAudit = new ServiceSecurityAuditBehavior();
             newAudit.AuditLogLocation = AuditLogLocation.Application;
@@ -45,12 +45,12 @@ namespace Service
 
             host.Description.Behaviors.Remove<ServiceSecurityAuditBehavior>();
             host.Description.Behaviors.Add(newAudit);
+            
 
-
-            Database.ReadPerformances();
-            Database.ReadReservations();
-            Database.ReadUsers();
-            Database.ReadDiscount();           
+            Database.performances = Database.ReadPerformances();
+            Database.reservations = Database.ReadReservations();
+            Database.users =  Database.ReadUsers();
+            Database.ReadDiscount();
 
             try
             {                 

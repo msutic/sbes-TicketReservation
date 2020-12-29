@@ -40,7 +40,6 @@ namespace Client
             using (WCFClient proxy = new WCFClient(binding, address))
             {
                 Console.WriteLine("Connection established.");
-                proxy.SendMySubjectName("");
                 do
                 {
                     Console.WriteLine("\nMenu:\n\t1. Add Performance\n\t2. Modify Performance\n\t3. Modify Discount\n\t" +
@@ -56,7 +55,7 @@ namespace Client
                         Console.WriteLine($"Invalid input: {e.Message}.");
                     }
 
-                    switch (input) //da li treba validirati da su dobri unosi
+                    switch (input) //treba validirati da su dobri unosi
                     {
                         case 1:
                             if (!proxy.Validation("Add Performance"))

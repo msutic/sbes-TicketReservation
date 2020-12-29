@@ -38,7 +38,5 @@ namespace Contracts
         [FaultContract(typeof(SecurityException))]
         [OperationContract]
         bool Validation(string methodName);
-        [OperationContract]
-        void SendMySubjectName(string subjectName);
     }
 }

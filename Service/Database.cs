@@ -18,8 +18,9 @@ namespace Service
         public static List<Reservation> reservations;
         public static double Discount { get; set; }
 
-        public static void ReadPerformances()
+        public static List<Performance> ReadPerformances()
         {
+            List<Performance> temp = new List<Performance>();
             try
             {
                 string fullPath = Path.GetFullPath(path + "performances.txt");
@@ -34,7 +35,7 @@ namespace Service
                     DateTime date = new DateTime(int.Parse(dateTokens[2]), int.Parse(dateTokens[1]), int.Parse(dateTokens[0]));
 
                     Performance p = new Performance(int.Parse(tokens[0]), tokens[1], date, int.Parse(tokens[3]), double.Parse(tokens[4]));
-                    performances.Add(p);
+                    temp.Add(p);
                 }
 
                 reader.Close();
@@ -44,6 +45,7 @@ namespace Service
             {
                 Console.WriteLine($"Error while trying to read performances : {e.Message}");
             }
+            return temp;
         }
 
         public static void ReadDiscount()
@@ -71,8 +73,9 @@ namespace Service
             }
         }
 
-        public static void ReadUsers()
+        public static List<User> ReadUsers()
         {
+            List<User> temp = new List<User>();
             try
             {
                 string fullPath = Path.GetFullPath(path + "users.txt");
@@ -108,7 +111,7 @@ namespace Service
                     {
                         user = new User(tokens[0], tokens[1]);
                     }
-                    users.Add(user);
+                    temp.Add(user);
                 }
 
                 reader.Close();
@@ -118,10 +121,12 @@ namespace Service
             {
                 Console.WriteLine($"Error while trying to read users : {e.Message}");
             }
+            return temp;
         }
 
-        public static void ReadReservations()
+        public static List<Reservation> ReadReservations()
         {
+            List<Reservation> temp = new List<Reservation>();
             try
             {
                 string fullPath = Path.GetFullPath(path + "reservations.txt");
@@ -139,7 +144,7 @@ namespace Service
 
                     Reservation r = new Reservation(int.Parse(tokens[0]), int.Parse(tokens[1]), date, int.Parse(tokens[3]));
                     r.State = (ReservationState)Enum.Parse(typeof(ReservationState), tokens[4]);
-                    reservations.Add(r);
+                    temp.Add(r);
                 }
 
                 reader.Close();
@@ -149,6 +154,7 @@ namespace Service
             {
                 Console.WriteLine($"Error while trying to read performances : {e.Message}");
             }
+            return temp;
         }
 
         public static void WritePerformance(Performance p)
