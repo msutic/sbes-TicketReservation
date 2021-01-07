@@ -3,6 +3,7 @@ using Manager;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IdentityModel.Policy;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
@@ -37,25 +38,35 @@ namespace Service
 
             ///Set appropriate service's certificate on the host. Use CertManager class to obtain the certificate based on the "srvCertCN"
             host.Credentials.ServiceCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
-            
-            //AuditBehaviour
+
+            ///Set custom policy
+            host.Authorization.PrincipalPermissionMode = PrincipalPermissionMode.Custom;
+            List<IAuthorizationPolicy> policies = new List<IAuthorizationPolicy>();
+            policies.Add(new CustomAuthorizationPolicy());
+            host.Authorization.ExternalAuthorizationPolicies = policies.AsReadOnly();
+
+            ///AuditBehaviour
             ServiceSecurityAuditBehavior newAudit = new ServiceSecurityAuditBehavior();
             newAudit.AuditLogLocation = AuditLogLocation.Application;
             newAudit.ServiceAuthorizationAuditLevel = AuditLevel.SuccessOrFailure;
 
             host.Description.Behaviors.Remove<ServiceSecurityAuditBehavior>();
-            host.Description.Behaviors.Add(newAudit);
-            
+            host.Description.Behaviors.Add(newAudit);            
 
             Database.performances = Database.ReadPerformances();
             Database.reservations = Database.ReadReservations();
             Database.users =  Database.ReadUsers();
             Database.ReadDiscount();
 
+            Database.performanceChanged = false;
+            Database.reservationsChanged = false;
+            Database.usersChanged = false;
+            Database.discountChanged = false;
+
             try
             {                 
                 host.Open();
-                Console.WriteLine("WCFService is started.\nPress <enter> to stop ...");
+                Console.WriteLine("WCFService is started.\nPress <enter> to stop...");
                 Console.ReadLine();
             }
             catch (Exception e)
@@ -67,10 +78,14 @@ namespace Service
             finally
             {
                 host.Close();
-                Database.WriteAllPerformances();
-                Database.WriteAllUsers();
-                Database.WriteAllReservations();
-                Database.WriteDiscount();
+                if (Database.performanceChanged)
+                    Database.WriteAllPerformances();
+                if (Database.usersChanged)
+                    Database.WriteAllUsers();
+                if (Database.reservationsChanged)
+                    Database.WriteAllReservations();
+                if (Database.discountChanged)
+                    Database.WriteDiscount();
             }
 
         }

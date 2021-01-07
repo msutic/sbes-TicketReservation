@@ -29,11 +29,11 @@ namespace Client
             int id;
             string name = "";
             string dateInput = "";
-            DateTime date;
-            int room;
-            double price;
-            int discount;
-            int ticketQuantity;
+            DateTime date = DateTime.Now;
+            int room = -1;
+            double price = -1;
+            int discount = -1;
+            int ticketQuantity = -1;
             string[] tokens;
             int input = 0;
 
@@ -55,89 +55,212 @@ namespace Client
                         Console.WriteLine($"Invalid input: {e.Message}.");
                     }
 
-                    switch (input) //treba validirati da su dobri unosi
+                    switch (input)
                     {
-                        case 1:
-                            if (!proxy.Validation("Add Performance"))
-                                break;
+                        case 1:                            
+
                             Console.Write("\nNew Performance\n\tname: ");
-                            name = Console.ReadLine();
+                            try
+                            {
+                                name = Console.ReadLine();
+                            }
+                            catch(Exception e)
+                            {
+                                Console.WriteLine($"Input not valid {e.Message}. Please try again.");
+                                break;
+                            }
+
                             Console.Write("\tdate (format dd/mm/yyyy): ");
-                            dateInput = Console.ReadLine();
-                            tokens = dateInput.Split('/');
-                            date = new DateTime(int.Parse(tokens[2]), int.Parse(tokens[1]), int.Parse(tokens[0]));
+                            try
+                            {
+                                dateInput = Console.ReadLine();
+                                tokens = dateInput.Split('/');
+                                date = new DateTime(int.Parse(tokens[2]), int.Parse(tokens[1]), int.Parse(tokens[0]));
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine($"Input not valid {e.Message}. Please try again.");
+                                break;
+                            }
+
                             Console.Write("\troom: ");
-                            room = int.Parse(Console.ReadLine());
+                            try
+                            {
+                                room = int.Parse(Console.ReadLine());
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine($"Input not valid {e.Message}. Please try again.");
+                                break;
+                            }
+
                             Console.Write("\tticket price: ");
-                            price = double.Parse(Console.ReadLine());
+                            try
+                            {
+                                price = double.Parse(Console.ReadLine());
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine($"Input not valid {e.Message}. Please try again.");
+                                break;
+                            }
+
                             proxy.AddPerformance(name, date, room, price, out id);
                             break;
 
                         case 2:
-                            if (!proxy.Validation("Modify Performance"))
-                                break;
+
                             Console.WriteLine("\nEnter id of the performance you want to modify: ");
-                            id = int.Parse(Console.ReadLine());
-                            if (!proxy.CheckIfPerformanceExists(id))
+                            try
+                            {
+                                id = int.Parse(Console.ReadLine());
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine($"Input not valid {e.Message}. Please try again.");
                                 break;
+                            }
+
+                            if (!proxy.CheckIfPerformanceExists(id,2))
+                                break;
+
                             Console.Write("\tname: ");
-                            name = Console.ReadLine();
+                            try
+                            {
+                                name = Console.ReadLine();
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine($"Input not valid {e.Message}. Please try again.");
+                                break;
+                            }
+
                             Console.Write("\tdate (format dd/mm/yyyy): ");
-                            dateInput = Console.ReadLine();
-                            tokens = dateInput.Split('/');
-                            date = new DateTime(int.Parse(tokens[2]), int.Parse(tokens[1]), int.Parse(tokens[0]));
+                            try
+                            {
+                                dateInput = Console.ReadLine();
+                                tokens = dateInput.Split('/');
+                                date = new DateTime(int.Parse(tokens[2]), int.Parse(tokens[1]), int.Parse(tokens[0]));
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine($"Input not valid {e.Message}. Please try again.");
+                                break;
+                            }
+
                             Console.Write("\troom: ");
-                            room = int.Parse(Console.ReadLine());
+                            try
+                            {
+                                room = int.Parse(Console.ReadLine());
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine($"Input not valid {e.Message}. Please try again.");
+                                break;
+                            }
+
                             Console.Write("\tticket price: ");
-                            price = double.Parse(Console.ReadLine());
+                            try
+                            {
+                                price = double.Parse(Console.ReadLine());
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine($"Input not valid {e.Message}. Please try again.");
+                                break;
+                            }
+
                             proxy.ModifyPerformance(id, name, date, room, price);
                             break;
 
                         case 3:
-                            if (!proxy.Validation("Modify Discount"))
-                                break;
+
                             Console.Write("\nEnter new discount: ");
-                            discount = int.Parse(Console.ReadLine());
+                            try
+                            {
+                                discount = int.Parse(Console.ReadLine());
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine($"Input not valid {e.Message}. Please try again.");
+                                break;
+                            }
+
                             proxy.ModifyDiscount(discount);
                             break;
 
                         case 4:
-                            if (!proxy.Validation("Make Reservation"))
-                                break;
+
                             Console.WriteLine("\nEnter id of the performance you want to reserve: ");
-                            id = int.Parse(Console.ReadLine());
-                            if (!proxy.CheckIfPerformanceExists(id))
+                            try
+                            {
+                                id = int.Parse(Console.ReadLine());
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine($"Input not valid {e.Message}. Please try again.");
                                 break;
+                            }
+
+                            if (!proxy.CheckIfPerformanceExists(id,4))
+                                break;
+
                             Console.Write("\n\tticketQuantity: ");
-                            ticketQuantity = int.Parse(Console.ReadLine());
+                            try
+                            {
+                                ticketQuantity = int.Parse(Console.ReadLine());
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine($"Input not valid {e.Message}. Please try again.");
+                                break;
+                            }
+
                             proxy.MakeReservation(id, DateTime.Now, ticketQuantity, out int reservationId);
                             break;
+
                         case 5:
-                            if (!proxy.Validation("Pay Reservation"))
-                                break;
+
                             Console.WriteLine("\nEnter id of the reservation you want to pay: ");
-                            id = int.Parse(Console.ReadLine());
+                            try
+                            {
+                                id = int.Parse(Console.ReadLine());
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine($"Input not valid {e.Message}. Please try again.");
+                                break;
+                            }
+
                             if (!proxy.CheckIfReservationCanBePaied(id))
                                 break;
+
                             proxy.PayReservation(id);
                             break;
+
                         case 6:
                             proxy.ListAllPerformances();
                             break;
+
                         case 7:
                             proxy.ListAllUsers();
                             break;
+
                         case 8:
                             proxy.ListAllReservations();
                             break;
+
                         case 9:
                             proxy.ListDiscount();
                             break;
+
                         case 10:
                             proxy.ListUser();
                             break;
+
                         case 11:
                             break;
+
                         default:
                             Console.WriteLine("Entered invalid number. Valid 1-11. Please try again.");
                             break;

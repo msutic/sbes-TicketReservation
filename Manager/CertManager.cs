@@ -44,10 +44,8 @@ namespace Manager
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Error while trying to get certificate from storage: {e.Message}");
+                Console.WriteLine($"Error while trying to get certificate from storage: {e.Message}.");
             }
-
-            //LOGIKA ZA AUTENTIFIKACIJU
 
             return null;
         }

@@ -27,7 +27,7 @@ namespace Manager
             catch (Exception e)
             {
                 customLog = null;
-                Console.WriteLine("Error while trying to create log handle. Error = {0}", e.Message);
+                Console.WriteLine("Error while trying to create log handle. Error = {0}.", e.Message);
             }
         }
 
@@ -63,6 +63,91 @@ namespace Manager
             }
         }
 
+        public static void WriteInFileSuccess(string userName, string fileName)
+        {
+            if (customLog != null)
+            {
+                string WriteInFileSuccess =
+                    AuditEvents.WriteInFileSuccess;
+                string message = String.Format(WriteInFileSuccess,
+                    userName, fileName);
+                customLog.WriteEntry(message);
+            }
+            else
+            {
+                throw new ArgumentException(string.Format("Error while trying to write event (eventid = {0}) to event log.",
+                    (int)AuditEventTypes.WriteInFileSuccess));
+            }
+        }
+
+        public static void ReadFromFileSuccess(string userName, string fileName)
+        {
+            if (customLog != null)
+            {
+                string ReadFromFileSuccess =
+                    AuditEvents.ReadFromFileSuccess;
+                string message = String.Format(ReadFromFileSuccess,
+                    userName, fileName);
+                customLog.WriteEntry(message);
+            }
+            else
+            {
+                throw new ArgumentException(string.Format("Error while trying to write event (eventid = {0}) to event log.",
+                    (int)AuditEventTypes.ReadFromFileSuccess));
+            }
+        }
+
+        public static void AddToBaseSuccess(string userName, string typeOfEntity)
+        {
+            if (customLog != null)
+            {
+                string AddToBaseSuccess =
+                    AuditEvents.AddToBaseSuccess;
+                string message = String.Format(AddToBaseSuccess,
+                    userName, typeOfEntity);
+                customLog.WriteEntry(message);
+            }
+            else
+            {
+                throw new ArgumentException(string.Format("Error while trying to write event (eventid = {0}) to event log.",
+                    (int)AuditEventTypes.AddToBaseSuccess));
+            }
+        }
+
+        public static void ChangeSuccess(string userName, string typeOfEntity)
+        {
+            if (customLog != null)
+            {
+                string ChangeSuccess =
+                    AuditEvents.ChangeSuccess;
+                string message = String.Format(ChangeSuccess,
+                    userName, typeOfEntity);
+                customLog.WriteEntry(message);
+            }
+            else
+            {
+                throw new ArgumentException(string.Format("Error while trying to write event (eventid = {0}) to event log.",
+                    (int)AuditEventTypes.ChangeSuccess));
+            }
+        }
+
+        public static void PayReservationSuccess(string userName, string oldState, string newState)
+        {
+            if (customLog != null)
+            {
+                string PayReservationSuccess =
+                    AuditEvents.PayReservationSuccess;
+                string message = String.Format(PayReservationSuccess,
+                    userName, oldState, newState);
+                customLog.WriteEntry(message);
+            }
+            else
+            {
+                throw new ArgumentException(string.Format("Error while trying to write event (eventid = {0}) to event log.",
+                    (int)AuditEventTypes.PayReservationSuccess));
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -83,6 +168,57 @@ namespace Manager
             {
                 throw new ArgumentException(string.Format("Error while trying to write event (eventid = {0}) to event log.",
                     (int)AuditEventTypes.AuthorizationFailed));
+            }
+        }
+
+        public static void WriteInFileFailed(string userName, string fileName, string reason)
+        {
+            if (customLog != null)
+            {
+                string WriteInFileFailed =
+                    AuditEvents.WriteInFileFailed;
+                string message = String.Format(WriteInFileFailed,
+                    userName, fileName, reason);
+                customLog.WriteEntry(message);
+            }
+            else
+            {
+                throw new ArgumentException(string.Format("Error while trying to write event (eventid = {0}) to event log.",
+                    (int)AuditEventTypes.WriteInFileFailed));
+            }
+        }
+
+        public static void ReadFromFileFailed(string userName, string fileName, string reason)
+        {
+            if (customLog != null)
+            {
+                string ReadFromFileFailed =
+                    AuditEvents.ReadFromFileFailed;
+                string message = String.Format(ReadFromFileFailed,
+                    userName, fileName, reason);
+                customLog.WriteEntry(message);
+            }
+            else
+            {
+                throw new ArgumentException(string.Format("Error while trying to write event (eventid = {0}) to event log.",
+                    (int)AuditEventTypes.ReadFromFileFailed));
+            }
+        }
+
+        public static void MethodCallFailed(string userName, string methodName, string reason)
+        {
+            if (customLog != null)
+            {
+                string MethodCallFailed =
+                    AuditEvents.MethodCallFailed;
+                string message = String.Format(MethodCallFailed,
+                    userName, methodName, reason);
+                customLog.WriteEntry(message);
+            }
+            else
+            {
+                throw new ArgumentException(string.Format("Error while trying to write event (eventid = {0}) to event log.",
+                    (int)AuditEventTypes.MethodCallFailed));
             }
         }
 

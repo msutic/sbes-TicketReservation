@@ -25,7 +25,7 @@ namespace Manager
 
             if (!certificate.Issuer.Equals(certificateOfService.Subject))
             {
-                throw new Exception("Cert is not from the valid issuer");
+                throw new Exception("Cert is not from the valid issuer.");
             }           
         }
     }

@@ -8,6 +8,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.ServiceModel;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Service
@@ -32,67 +33,84 @@ namespace Service
             return retValue;
         }
 
+        public string GetClientUserName()
+        {
+            string retValue = "";
+            try
+            {
+                string nameClient = Formatter.ParseName(ServiceSecurityContext.Current.PrimaryIdentity.Name);
+                string[] clientName = nameClient.Split(';');
+                string[] tokens = clientName[0].Split(',');
+                retValue = tokens[0].Split('=')[1];
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"\nError while trying to get the client name: {e.Message}.");
+            }
+            return retValue;
+        }
+
         public void ErrorMessage(string group, string method)
         {
-            string nameClient = Formatter.ParseName(ServiceSecurityContext.Current.PrimaryIdentity.Name);
-            string[] clientName = nameClient.Split(';');
-            string[] tokens = clientName[0].Split(',');
-            string name = tokens[0].Split('=')[1];
+            string userName = GetClientUserName();
             DateTime time = DateTime.Now;
-            string message = String.Format($"Access is denied. User {name} try to call {method} method (time : {time}). " +
-                $"For this method user needs to be member of group {group}.");
-            Console.WriteLine();
-            throw new FaultException<SecurityException>(new SecurityException(message));
+            string message = String.Format($"Access is denied. User {userName} try to call {method} method (time : {time}). " +
+                     $"For this method user needs to be member of group {group}");
+            SecurityException exception = new SecurityException(message);
+            throw new FaultException<SecurityException>(exception, new FaultReason(exception.Message));
         }
 
-        public bool Validation(string methodName)
-        {          
-            if (GetClientRole().Equals("Admin"))
-            {
-                if (methodName.Equals("Add Performance") || methodName.Equals("Modify Performance") || methodName.Equals("Modify Discount"))
-                { 
-                   return true;
-                }
-                else
-                {
-                   ErrorMessage("SuperKorisnik/Korisnik", methodName);
-                   return false;
-                }
-            }
-           else
-           {
-                if (methodName.Equals("Make Reservation") || methodName.Equals("Pay Reservation"))
-                {
-                    return true;
-                }
-                else
-                {
-                    ErrorMessage("Admin", methodName);
-                    return false;
-                }
-           }
-        }
-
-        public bool AddPerformance(string name, DateTime date, int room, double price, out int idPerformance)
+        public void AddPerformance(string name, DateTime date, int room, double price, out int idPerformance)
         {
+            CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
             idPerformance = -1;
-            Console.WriteLine("\nAdding performance...");
-            Performance performance = null;
-            if (Database.performances.Count()>0)
+
+            if (Thread.CurrentPrincipal.IsInRole("Admin"))
             {
-                performance = new Performance(Database.performances.Count(), name, date, room, price);
-                idPerformance = Database.performances.Count();
+                string userName = GetClientUserName();
+
+                Console.WriteLine("\nAdding performance...");
+                Performance performance = null;
+                if (Database.performances.Count() > 0)
+                {
+                    performance = new Performance(Database.performances.Count(), name, date, room, price);
+                    idPerformance = Database.performances.Count();
+                }
+                else
+                {
+                    performance = new Performance(0, name, date, room, price);
+                    idPerformance = 0;
+                }
+                Database.performances.Add(performance);
+
+                try
+                {
+                    Audit.AddToBaseSuccess(userName, "performance.");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+
+                Database.performanceChanged = true;
             }
             else
             {
-                performance = new Performance(0, name, date, room, price);
-                idPerformance = 0;
+                try
+                {
+                    Audit.AuthorizationFailed(GetClientUserName(), "Add Performance",
+                        $"Add Performance can be used only by user in the Admin group.");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+
+                ErrorMessage("Admin", "Add Performance");
             }
-            Database.performances.Add(performance);
-            return true;
         }
 
-        public bool CheckIfPerformanceExists(int id)
+        public bool CheckIfPerformanceExists(int id, int methodID)
         {
             foreach(Performance p in Database.performances)
             {
@@ -101,6 +119,30 @@ namespace Service
                     return true;
                 }
             }
+
+            string methodName;
+            string parameter;
+            if (id == 2)
+            {
+                methodName = "Modify Performance";
+                parameter = "performance.";
+            }
+            else
+            {
+                methodName = "Make Reservation";
+                parameter = "reservation.";
+            }
+
+            try
+            {
+                Audit.MethodCallFailed(GetClientUserName(), methodName,
+                    $"User did not enter a valid id of {parameter}.");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
             return false;
         }
 
@@ -108,19 +150,41 @@ namespace Service
         {
             Console.WriteLine();
             Console.WriteLine("List of performances in the system:");
+
             foreach (Performance p in Database.performances)
             {
                 Console.WriteLine(p.ToString());
             }
+
+            try
+            {
+                Audit.AuthorizationSuccess(GetClientUserName(),
+                    OperationContext.Current.IncomingMessageHeaders.Action);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
         }
 
         public void ListAllUsers()
         {
             Console.WriteLine();
-            Console.WriteLine("List of users in the system:");
+            Console.WriteLine("List of all users in the system:");
             foreach (User u in Database.users)
             {
                 Console.WriteLine(u.ToString());
+            }
+
+            try
+            {
+                Audit.AuthorizationSuccess(GetClientUserName(),
+                    OperationContext.Current.IncomingMessageHeaders.Action);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
             }
         }
 
@@ -132,119 +196,252 @@ namespace Service
             {
                 Console.WriteLine(r.ToString());
             }
+
+            try
+            {
+                Audit.AuthorizationSuccess(GetClientUserName(),
+                    OperationContext.Current.IncomingMessageHeaders.Action);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
 
-        public bool MakeReservation(int performanceId, DateTime date, int ticketQuantity, out int reservationId)
+        public void MakeReservation(int performanceId, DateTime date, int ticketQuantity, out int reservationId)
         {
+            CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
             reservationId = -1;
-            Console.WriteLine("\nMaking reservation...");
-            Reservation reservation = null;
 
-            string nameClient = Formatter.ParseName(ServiceSecurityContext.Current.PrimaryIdentity.Name);
-            string[] clientName = nameClient.Split(';');
-            string[] tokens = clientName[0].Split(',');
-            string clientUsername = tokens[0].Split('=')[1];
-
-            for (int i=0;i <Database.users.Count(); ++i)
+            if (Thread.CurrentPrincipal.IsInRole("Korisnik") || Thread.CurrentPrincipal.IsInRole("SuperKorisnik"))
             {
-                if (Database.users[i].Username.Equals(clientUsername))
-                {
-                    if (Database.reservations.Count()>0)
-                    {
-                        reservation = new Reservation(Database.reservations.Count(), performanceId, date, ticketQuantity);
-                        reservationId = Database.reservations.Count();
-                    }
-                    else
-                    {
-                        reservation = new Reservation(0, performanceId, date, ticketQuantity);
-                        reservationId = 0;
-                    }
-                    Database.users[i].Reservations.Add(reservation);
-                }
-            }
+                Console.WriteLine("\nMaking reservation...");
+                Reservation reservation = null;
 
-            Database.reservations.Add(reservation);
-            return true;
+                string clientUsername = GetClientUserName();
+
+                for (int i = 0; i < Database.users.Count(); ++i)
+                {
+                    if (Database.users[i].Username.Equals(clientUsername))
+                    {
+                        if (Database.reservations.Count() > 0)
+                        {
+                            reservation = new Reservation(Database.reservations.Count(), performanceId, date, ticketQuantity);
+                            reservationId = Database.reservations.Count();
+                        }
+                        else
+                        {
+                            reservation = new Reservation(0, performanceId, date, ticketQuantity);
+                            reservationId = 0;
+                        }
+                        Database.users[i].Reservations.Add(reservation);
+
+                        try
+                        {
+                            Audit.AddToBaseSuccess(clientUsername, "reservation.");
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e.Message);
+                        }
+
+                    }
+                }
+                Database.reservations.Add(reservation);
+                Database.reservationsChanged = true;
+            }
+            else
+            {
+                try
+                {
+                    Audit.AuthorizationFailed(GetClientUserName(), "Make Reservation",
+                        $"Make Reservation can be used only by user in the Korisnik or SuperKorisnik group.");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+
+                ErrorMessage("Korisnik or SuperKorisnik", "Make Reservation");
+            }
         }
 
         public void ModifyDiscount(int discount)
         {
-            Console.WriteLine("\nModifying discount...");
-            Database.Discount = discount;
-        }
+            string clientUsername = GetClientUserName();
+            CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
 
-        public bool ModifyPerformance(int id, string name, DateTime date, int room, double ticketPrice)
-        {
-            Console.WriteLine("\nModifying performance...");
-
-            for(int i=0; i<Database.performances.Count(); ++i)
+            if (Thread.CurrentPrincipal.IsInRole("Admin"))
             {
-                if (id.Equals(Database.performances[i].Id))
+                Console.WriteLine("\nModifying discount...");
+
+                Database.Discount = discount;
+                Database.discountChanged = true;
+
+                try
                 {
-                    Database.performances[i].Name = name;
-                    Database.performances[i].Date = date;
-                    Database.performances[i].Room = room;
-                    Database.performances[i].TicketPrice = ticketPrice;
+                    Audit.ChangeSuccess(clientUsername, "discount.");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
                 }
             }
-            
-            return true;
+            else
+            {
+                try
+                {
+                    Audit.AuthorizationFailed(GetClientUserName(), "Modify Discount",
+                        $"Modify Discount can be used only by user in the Admin group.");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+
+                ErrorMessage("Admin", "Modify Discount");
+            }
         }
 
-        public bool PayReservation(int reservationsId)
+        public void ModifyPerformance(int id, string name, DateTime date, int room, double ticketPrice)
         {
-            string nameClient = Formatter.ParseName(ServiceSecurityContext.Current.PrimaryIdentity.Name);
-            string[] clientName = nameClient.Split(';');
-            string[] tokens = clientName[0].Split(',');
-            string clientUsername = tokens[0].Split('=')[1];
-            string clientRole = tokens[1].Split('=')[1];
-            Console.WriteLine("\nPaying reservation...");
-            foreach (User u in Database.users)
-            {
-                if (u.Username.Equals(clientUsername))
-                {
-                    foreach (Reservation r in u.Reservations)
-                    {
-                        foreach (Performance p in Database.performances)
-                        {
-                            if (p.Id.Equals(r.PerformanceId))
-                            {
-                                if (r.Id.Equals(reservationsId))
-                                {
-                                    if (clientRole.Equals("Korisnik"))
-                                    { 
-                                       u.Balance -= r.TicketQuantity * p.TicketPrice;
-                                    }
-                                    else
-                                    {
-                                        u.Balance -= r.TicketQuantity * p.TicketPrice - (r.TicketQuantity * p.TicketPrice) * (Database.Discount / 100);
-                                    }
+            CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
 
-                                    for (int i = 0; i < u.Reservations.Count(); i++)
+            if (Thread.CurrentPrincipal.IsInRole("Admin"))
+            {
+
+                Console.WriteLine("\nModifying performance...");
+
+                for (int i = 0; i < Database.performances.Count(); ++i)
+                {
+                    if (id.Equals(Database.performances[i].Id))
+                    {
+                        Database.performances[i].Name = name;
+                        Database.performances[i].Date = date;
+                        Database.performances[i].Room = room;
+                        Database.performances[i].TicketPrice = ticketPrice;
+                    }
+                }
+
+                try
+                {
+                    Audit.ChangeSuccess(GetClientUserName(), "performance.");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+
+                Database.performanceChanged = true;
+            }
+            else
+            {
+                try
+                {
+                    Audit.AuthorizationFailed(GetClientUserName(), "Modify Performance",
+                        $"Modify Performance can be used only by user in the Admin group.");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+
+                ErrorMessage("Admin", "Modify Performance");
+            }
+        }
+
+        public void PayReservation(int reservationsId)
+        {
+            CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
+
+            if (Thread.CurrentPrincipal.IsInRole("Korisnik") || Thread.CurrentPrincipal.IsInRole("SuperKorisnik"))
+            {
+                string clientUsername = GetClientUserName();
+                string clientRole = GetClientRole();
+                Console.WriteLine("\nPaying reservation...");
+                foreach (User u in Database.users)
+                {
+                    if (u.Username.Equals(clientUsername))
+                    {
+                        foreach (Reservation r in u.Reservations)
+                        {
+                            foreach (Performance p in Database.performances)
+                            {
+                                if (p.Id.Equals(r.PerformanceId))
+                                {
+                                    if (r.Id.Equals(reservationsId))
                                     {
-                                        if (u.Reservations[i].Id.Equals(reservationsId))
+                                        if (clientRole.Equals("Korisnik"))
                                         {
-                                            u.Reservations[i].State = ReservationState.PAID;
-                                            return true;
+                                            u.Balance -= r.TicketQuantity * p.TicketPrice;
+                                            try
+                                            {
+                                                Audit.ChangeSuccess(Formatter.ParseName(WindowsIdentity.GetCurrent().Name), "balance.");
+                                            }
+                                            catch (Exception e)
+                                            {
+                                                Console.WriteLine(e.Message);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            u.Balance -= r.TicketQuantity * p.TicketPrice - (r.TicketQuantity * p.TicketPrice) * (Database.Discount / 100);
+                                            try
+                                            {
+                                                Audit.ChangeSuccess(Formatter.ParseName(WindowsIdentity.GetCurrent().Name), "balance.");
+                                            }
+                                            catch (Exception e)
+                                            {
+                                                Console.WriteLine(e.Message);
+                                            }
+                                        }
+
+                                        for (int i = 0; i < u.Reservations.Count(); i++)
+                                        {
+                                            if (u.Reservations[i].Id.Equals(reservationsId))
+                                            {
+                                                u.Reservations[i].State = ReservationState.PAID;
+
+                                                try
+                                                {
+                                                    Audit.PayReservationSuccess(clientUsername, ReservationState.UNPAID.ToString(), ReservationState.PAID.ToString());
+                                                }
+                                                catch (Exception e)
+                                                {
+                                                    Console.WriteLine(e.Message);
+                                                }
+
+                                                Database.reservationsChanged = true;
+                                            }
                                         }
                                     }
                                 }
+
                             }
-                                
                         }
                     }
                 }
             }
-            return false;
+            else
+            {
+                try
+                {
+                    Audit.AuthorizationFailed(GetClientUserName(), "Pay Reservation",
+                        $"Pay Reservation can be used only by user in the Korisnik or SuperKorisnik group.");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+
+                ErrorMessage("Korisnik or SuperKorisnik", "Pay Reservation");
+            }
         }
 
         public bool CheckIfReservationCanBePaied(int reservationsId)
         {
-            string nameClient = Formatter.ParseName(ServiceSecurityContext.Current.PrimaryIdentity.Name);
-            string[] clientName = nameClient.Split(';');
-            string[] tokens = clientName[0].Split(',');
-            string clientUsername = tokens[0].Split('=')[1];
-            string clientRole = tokens[1].Split('=')[1];
+            string clientUsername = GetClientUserName();
+            string clientRole = GetClientRole();
             foreach (User u in Database.users)
             {
                 if (u.Username.Equals(clientUsername))
@@ -280,16 +477,28 @@ namespace Service
                     }
                 }
             }
+
+            try
+            {
+                Audit.MethodCallFailed(GetClientUserName(), "Pay Reservation",
+                    $"User did not enter a valid id of reservation.");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
             return false;
         }       
 
         public void ListDiscount()
         {
-            Console.WriteLine($"\nCurrent discount is {Database.Discount}");
+            Console.WriteLine($"\nCurrent discount is {Database.Discount}.");
+
             try
             {
-                Audit.AuthorizationSuccess(Formatter.ParseName(ServiceSecurityContext.Current.PrimaryIdentity.Name),
-                   OperationContext.Current.IncomingMessageHeaders.Action);
+                Audit.AuthorizationSuccess(GetClientUserName(),
+                    OperationContext.Current.IncomingMessageHeaders.Action);
             }
             catch (Exception e)
             {
@@ -299,11 +508,19 @@ namespace Service
 
         public void ListUser()
         {
-            string nameClient = Formatter.ParseName(ServiceSecurityContext.Current.PrimaryIdentity.Name);
-            string[] clientName = nameClient.Split(';');
-            string[] tokens = clientName[0].Split(',');
-            string clientUsername = tokens[0].Split('=')[1];
-            Console.WriteLine($"\nMy informations: {Database.users.First(item => item.Username == clientUsername).ToString()}");
+            string clientUsername = GetClientUserName();
+
+            Console.WriteLine($"\nMy informations: {Database.users.First(item => item.Username == clientUsername).ToString()}.");
+
+            try
+            {
+                Audit.AuthorizationSuccess(clientUsername,
+                    OperationContext.Current.IncomingMessageHeaders.Action);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
     }
 }

@@ -61,6 +61,15 @@ namespace Manager {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to User {0} successfully added to base new {1}.
+        /// </summary>
+        internal static string AddToBaseSuccess {
+            get {
+                return ResourceManager.GetString("AddToBaseSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to User {0} is successfully authenticated.
         /// </summary>
         internal static string AuthenticationSuccess {
@@ -70,20 +79,83 @@ namespace Manager {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to User {0} failed to access {1}. Reason: {2}..
+        ///   Looks up a localized string similar to User {0} failed to access {1}. Reason: {2}.
         /// </summary>
-        internal static string AuthorizationFailure {
+        internal static string AuthorizationFailed {
             get {
-                return ResourceManager.GetString("AuthorizationFailure", resourceCulture);
+                return ResourceManager.GetString("AuthorizationFailed", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to User {0} successfully accessed to {1}.
+        ///   Looks up a localized string similar to User {0} successfully accessed to {1}..
         /// </summary>
         internal static string AuthorizationSuccess {
             get {
                 return ResourceManager.GetString("AuthorizationSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User {0} successfully changed {1}.
+        /// </summary>
+        internal static string ChangeSuccess {
+            get {
+                return ResourceManager.GetString("ChangeSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User {0} failed to {1}. Reason: {2}.
+        /// </summary>
+        internal static string MethodCallFailed {
+            get {
+                return ResourceManager.GetString("MethodCallFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User {0} successfully changed reservation state from {1} to {2}.
+        /// </summary>
+        internal static string PayReservationSuccess {
+            get {
+                return ResourceManager.GetString("PayReservationSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User {0} failed to read from file {1}. Reason: {2}.
+        /// </summary>
+        internal static string ReadFromFileFailed {
+            get {
+                return ResourceManager.GetString("ReadFromFileFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User {0} successfully read from file {1}.
+        /// </summary>
+        internal static string ReadFromFileSuccess {
+            get {
+                return ResourceManager.GetString("ReadFromFileSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User {0} failed to write in file {1}. Reason: {2}.
+        /// </summary>
+        internal static string WriteInFileFailed {
+            get {
+                return ResourceManager.GetString("WriteInFileFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User {0} successfully wrote to file {1}.
+        /// </summary>
+        internal static string WriteInFileSuccess {
+            get {
+                return ResourceManager.GetString("WriteInFileSuccess", resourceCulture);
             }
         }
     }

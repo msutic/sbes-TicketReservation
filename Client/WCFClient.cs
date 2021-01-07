@@ -31,28 +31,24 @@ namespace Client
             factory = this.CreateChannel();
         }
 
-        public bool ModifyPerformance(int id, string name, DateTime date, int room, double ticketPrice)
+        public void ModifyPerformance(int id, string name, DateTime date, int room, double ticketPrice)
         {
             try
             {
-                if (factory.ModifyPerformance(id, name, date, room, ticketPrice))
-                {
-                    Console.WriteLine($"Successfully modified performance with id {id}.");
-                    return true;
-                }
+                factory.ModifyPerformance(id, name, date, room, ticketPrice);
+                Console.WriteLine($"Successfully modified performance with id {id}.");               
             }
             catch (Exception e)
             {
                 Console.WriteLine($"Error while trying to modify performance: {e.Message}.");
             }
-            return false;
         }
 
-        public bool CheckIfPerformanceExists(int id)
+        public bool CheckIfPerformanceExists(int id, int methodID)
         {
             try
             {
-                if (!factory.CheckIfPerformanceExists(id))
+                if (!factory.CheckIfPerformanceExists(id,methodID))
                 {
                     Console.WriteLine($"Performance with id {id} doesn't exist.");
                     return false;
@@ -66,23 +62,19 @@ namespace Client
             return true;
         }
 
-        public bool AddPerformance(string name, DateTime date, int room, double price, out int idPerformance)
+        public void AddPerformance(string name, DateTime date, int room, double price, out int idPerformance)
         {
             idPerformance = -1;
             try
             {
-                if (factory.AddPerformance(name, date, room, price, out int id))
-                {
-                    idPerformance = id;
-                    Console.WriteLine($"Successfully added new performance with id {id}.");
-                    return true;
-                }
+                factory.AddPerformance(name, date, room, price, out int id);
+                idPerformance = id;
+                Console.WriteLine($"Successfully added new performance with id {id}.");
             }
             catch (Exception e)
             {
                 Console.WriteLine($"Error while trying to add performance: {e.Message}.");
             }
-            return false;
         }
 
         public void ModifyDiscount(int discount)
@@ -94,25 +86,21 @@ namespace Client
             }
             catch(Exception e)
             {
-                Console.WriteLine($"Error while trying to modify discount {e.Message}.");
+                Console.WriteLine($"Error while trying to modify discount: {e.Message}.");
             }
         }
 
-        public bool PayReservation(int reservationsId)
+        public void PayReservation(int reservationsId)
         {
             try
             {
-                if (factory.PayReservation(reservationsId))
-                {
-                    Console.WriteLine($"Successfully paied reservation with id {reservationsId}.");
-                    return true;
-                }
+                factory.PayReservation(reservationsId);
+                Console.WriteLine($"Successfully paied reservation with id {reservationsId}.");
             }
             catch (Exception e)
             {
                 Console.WriteLine($"Error while trying to pay reservation: {e.Message}.");
             }
-            return false;
         }       
 
         public void ListAllPerformances()
@@ -151,23 +139,19 @@ namespace Client
             }
         }
 
-        public bool MakeReservation(int performanceId, DateTime date, int ticketQuantity, out int reservationId)
+        public void MakeReservation(int performanceId, DateTime date, int ticketQuantity, out int reservationId)
         {
             reservationId = -1;
             try
             {
-                if (factory.MakeReservation(performanceId, date, ticketQuantity, out int id))
-                {
-                    reservationId = id;
-                    Console.WriteLine($"Successfully made new reservation, for performance with id {performanceId}. New reservations id is {reservationId}.");
-                    return true;
-                }
+                factory.MakeReservation(performanceId, date, ticketQuantity, out int id);
+                reservationId = id;
+                Console.WriteLine($"Successfully made new reservation, for performance with id {performanceId}. New reservations id is {reservationId}.");                
             }
             catch (Exception e)
             {
                 Console.WriteLine($"Error while trying to make reservation: ${e.Message}.");
             }
-            return false;
         }
 
         public bool CheckIfReservationCanBePaied(int reservationsId)
@@ -192,33 +176,25 @@ namespace Client
             try
             { 
                 factory.ListDiscount();
-            }
-            catch (Exception e)
+            }               
+            catch(Exception e)
             {
-                Console.WriteLine($"Error while trying to list the discount: {e.Message}.");
+                Console.WriteLine($"Error while trying to list the dicsount: {e.Message}.");
             }
         }
 
         public void ListUser()
         {
-            factory.ListUser();
-        }
-        
-        public bool Validation(string methodName)
-        {
-            bool retValue = false;
             try
             {
-                factory.Validation(methodName);
-                retValue = true;
+                factory.ListUser();
             }
-            catch (FaultException<SecurityException> e)
+            catch (Exception e)
             {
-                Console.WriteLine(e.Detail.Message);
+                Console.WriteLine($"Error while trying to list the user: {e.Message}.");
             }
-            return retValue;
         }
-
+        
         public void Dispose()
         {
             if (factory != null)

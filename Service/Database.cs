@@ -1,8 +1,10 @@
 ﻿using Contracts;
+using Manager;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Principal;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +14,11 @@ namespace Service
     public class Database
     {
         private static string path = @"..\..\items\";
+
+        public static bool performanceChanged;
+        public static bool usersChanged;
+        public static bool reservationsChanged;
+        public static bool discountChanged;
 
         public static List<Performance> performances;
         public static List<User> users;
@@ -40,9 +47,25 @@ namespace Service
 
                 reader.Close();
                 stream.Close();
+                try
+                {
+                    Audit.ReadFromFileSuccess(Formatter.ParseName(WindowsIdentity.GetCurrent().Name), "performances.txt");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
             }
             catch(Exception e)
             {
+                try
+                {
+                    Audit.ReadFromFileFailed(Formatter.ParseName(WindowsIdentity.GetCurrent().Name), "performances.txt", e.Message);
+                }
+                catch (Exception eror)
+                {
+                    Console.WriteLine(eror.Message);
+                }
                 Console.WriteLine($"Error while trying to read performances : {e.Message}");
             }
             return temp;
@@ -65,10 +88,25 @@ namespace Service
 
                 reader.Close();
                 stream.Close();
-
+                try
+                {
+                    Audit.ReadFromFileSuccess(Formatter.ParseName(WindowsIdentity.GetCurrent().Name), "discount.txt");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
             }
             catch (Exception e)
             {
+                try
+                {
+                    Audit.ReadFromFileFailed(Formatter.ParseName(WindowsIdentity.GetCurrent().Name), "discount.txt", e.Message);
+                }
+                catch (Exception eror)
+                {
+                    Console.WriteLine(eror.Message);
+                }
                 Console.WriteLine($"Error while trying to read discount : {e.Message}");
             }
         }
@@ -116,9 +154,25 @@ namespace Service
 
                 reader.Close();
                 stream.Close();
+                try
+                {
+                    Audit.ReadFromFileSuccess(Formatter.ParseName(WindowsIdentity.GetCurrent().Name), "users.txt");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
             }
             catch (Exception e)
             {
+                try
+                {
+                    Audit.ReadFromFileFailed(Formatter.ParseName(WindowsIdentity.GetCurrent().Name), "users.txt", e.Message);
+                }
+                catch (Exception eror)
+                {
+                    Console.WriteLine(eror.Message);
+                }
                 Console.WriteLine($"Error while trying to read users : {e.Message}");
             }
             return temp;
@@ -149,9 +203,25 @@ namespace Service
 
                 reader.Close();
                 stream.Close();
+                try
+                {
+                    Audit.ReadFromFileSuccess(Formatter.ParseName(WindowsIdentity.GetCurrent().Name), "reservations.txt");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
             }
             catch (Exception e)
             {
+                try
+                {
+                    Audit.ReadFromFileFailed(Formatter.ParseName(WindowsIdentity.GetCurrent().Name), "reservations.txt", e.Message);
+                }
+                catch (Exception eror)
+                {
+                    Console.WriteLine(eror.Message);
+                }
                 Console.WriteLine($"Error while trying to read performances : {e.Message}");
             }
             return temp;
@@ -163,9 +233,26 @@ namespace Service
             {
                 string fullPath = Path.GetFullPath(path + "performances.txt");
                 File.AppendAllText(fullPath, p.Write());
+                try
+                {
+                    Audit.WriteInFileSuccess(Formatter.ParseName(WindowsIdentity.GetCurrent().Name), "performances.txt");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
             }
             catch (Exception e)
             {
+                try
+                {
+                    Audit.WriteInFileFailed(Formatter.ParseName(WindowsIdentity.GetCurrent().Name), "performances.txt", e.Message);
+                }
+                catch (Exception eror)
+                {
+                    Console.WriteLine(eror.Message);
+                }
+
                 Console.WriteLine($"Error while trying to write performance with id {p.Id}, error: : {e.Message}");
             }
         }
@@ -194,9 +281,25 @@ namespace Service
             {
                 string fullPath = Path.GetFullPath(path + "users.txt");
                 File.AppendAllText(fullPath, u.Write());
+                try
+                {
+                    Audit.WriteInFileSuccess(Formatter.ParseName(WindowsIdentity.GetCurrent().Name), "users.txt");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
             }
             catch (Exception e)
             {
+                try
+                {
+                    Audit.WriteInFileFailed(Formatter.ParseName(WindowsIdentity.GetCurrent().Name), "users.txt", e.Message);
+                }
+                catch (Exception eror)
+                {
+                    Console.WriteLine(eror.Message);
+                }
                 Console.WriteLine($"Error while trying to write user with username {u.Username}, error: : {e.Message}");
             }
         }
@@ -226,6 +329,22 @@ namespace Service
                 string fullPath = Path.GetFullPath(path + "discount.txt");
                 File.WriteAllText(fullPath, String.Empty);
                 File.AppendAllText(fullPath, Discount.ToString());
+                try
+                {
+                    Audit.WriteInFileSuccess(Formatter.ParseName(WindowsIdentity.GetCurrent().Name), "discount.txt");
+                }
+                catch (Exception e)
+                {
+                    try
+                    {
+                        Audit.WriteInFileFailed(Formatter.ParseName(WindowsIdentity.GetCurrent().Name), "discount.txt", e.Message);
+                    }
+                    catch (Exception eror)
+                    {
+                        Console.WriteLine(eror.Message);
+                    }
+                    Console.WriteLine(e.Message);
+                }
             }
             catch (Exception e)
             {
@@ -239,9 +358,25 @@ namespace Service
             {
                 string fullPath = Path.GetFullPath(path + "reservations.txt");
                 File.AppendAllText(fullPath, r.Write());
+                try
+                {
+                    Audit.WriteInFileSuccess(Formatter.ParseName(WindowsIdentity.GetCurrent().Name), "reservations.txt");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
             }
             catch (Exception e)
             {
+                try
+                {
+                    Audit.WriteInFileFailed(Formatter.ParseName(WindowsIdentity.GetCurrent().Name), "reservations.txt", e.Message);
+                }
+                catch (Exception eror)
+                {
+                    Console.WriteLine(eror.Message);
+                }
                 Console.WriteLine($"Error while trying to write reservation with id {r.Id}, error: : {e.Message}");
             }
         }
