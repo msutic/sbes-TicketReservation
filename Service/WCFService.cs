@@ -59,13 +59,13 @@ namespace Service
             SecurityException exception = new SecurityException(message);
             throw new FaultException<SecurityException>(exception, new FaultReason(exception.Message));
         }
-
+        //ispraviti za principale
         public void AddPerformance(string name, DateTime date, int room, double price, out int idPerformance)
         {
             CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
             idPerformance = -1;
 
-            if (Thread.CurrentPrincipal.IsInRole("Admin"))
+            if (principal.IsInRole("Admin"))
             {
                 string userName = GetClientUserName();
 
@@ -438,6 +438,7 @@ namespace Service
             }
         }
 
+        //DODATI ISTO DA LI JE ADMIN I AKO JESTE DA ODMAH IZADJE
         public bool CheckIfReservationCanBePaied(int reservationsId)
         {
             string clientUsername = GetClientUserName();
