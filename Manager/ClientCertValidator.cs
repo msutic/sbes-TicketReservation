@@ -21,7 +21,7 @@ namespace Manager
         {          
             if (!certificate.Issuer.Equals(certificate.Subject))
             {
-                throw new Exception("Certificate is not self-signed.");
+                throw new Exception("Service certificate is not self-signed.");
             }            
         }
     }

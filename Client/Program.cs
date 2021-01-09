@@ -53,6 +53,7 @@ namespace Client
                     catch (Exception e)
                     {
                         Console.WriteLine($"Invalid input: {e.Message}.");
+                        input = 0;
                     }
 
                     switch (input)
@@ -77,9 +78,9 @@ namespace Client
                                 tokens = dateInput.Split('/');
                                 date = new DateTime(int.Parse(tokens[2]), int.Parse(tokens[1]), int.Parse(tokens[0]));
                             }
-                            catch (Exception e)
+                            catch (Exception)
                             {
-                                Console.WriteLine($"Input not valid {e.Message}. Please try again.");
+                                Console.WriteLine($"Input not valid. Please try again and enter date in format DD/MM/YYYY.");
                                 break;
                             }
 
@@ -144,7 +145,7 @@ namespace Client
                             }
                             catch (Exception e)
                             {
-                                Console.WriteLine($"Input not valid {e.Message}. Please try again.");
+                                Console.WriteLine($"Input not valid. Please try again and enter date in format DD/MM/YYYY.");
                                 break;
                             }
 

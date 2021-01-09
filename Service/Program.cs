@@ -58,11 +58,6 @@ namespace Service
             Database.users =  Database.ReadUsers();
             Database.ReadDiscount();
 
-            Database.performanceChanged = false;
-            Database.reservationsChanged = false;
-            Database.usersChanged = false;
-            Database.discountChanged = false;
-
             try
             {                 
                 host.Open();
@@ -77,15 +72,7 @@ namespace Service
             }
             finally
             {
-                host.Close();
-                if (Database.performanceChanged)
-                    Database.WriteAllPerformances();
-                if (Database.usersChanged)
-                    Database.WriteAllUsers();
-                if (Database.reservationsChanged)
-                    Database.WriteAllReservations();
-                if (Database.discountChanged)
-                    Database.WriteDiscount();
+                host.Close();                
             }
 
         }

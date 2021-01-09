@@ -57,6 +57,7 @@ namespace Client
             catch (Exception e)
             {
                 Console.WriteLine($"Error while trying to check if performance exists {e.Message}.");
+                return false;
             }
 
             return true;
@@ -167,6 +168,7 @@ namespace Client
             catch(Exception e)
             {
                 Console.WriteLine($"Error while trying to check if reservation can be paied: {e.Message}.");
+                return false;
             }
             return true;
         }
@@ -203,6 +205,6 @@ namespace Client
             }
 
             this.Close();
-        }
+        }      
     }
 }

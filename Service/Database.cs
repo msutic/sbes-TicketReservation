@@ -15,11 +15,6 @@ namespace Service
     {
         private static string path = @"..\..\items\";
 
-        public static bool performanceChanged;
-        public static bool usersChanged;
-        public static bool reservationsChanged;
-        public static bool discountChanged;
-
         public static List<Performance> performances;
         public static List<User> users;
         public static List<Reservation> reservations;
@@ -257,7 +252,7 @@ namespace Service
             }
         }
 
-        public static void WriteAllPerformances()
+        public static void WritePerformances()
         {
             try
             {
@@ -304,7 +299,7 @@ namespace Service
             }
         }
 
-        public static void WriteAllUsers()
+        public static void WriteUsers()
         {
             try
             {
@@ -381,7 +376,7 @@ namespace Service
             }
         }
 
-        public static void WriteAllReservations()
+        public static void WriteReservations()
         {
             try
             {
